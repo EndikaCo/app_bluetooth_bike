@@ -45,12 +45,14 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.bluetooth_bike.R
 import com.example.bluetooth_bike.Routes
 
 @Composable
-fun LoginScreen(navController: NavController, viewModel: LoginViewModel) {
+fun LoginScreen(navController: NavController) {
+    val viewModel: LoginViewModel = viewModel()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -58,7 +60,7 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel) {
     ) {
 
         Header(Modifier.align(Alignment.TopEnd))
-        Body(Modifier.align(Alignment.Center), navController, viewModel)
+        Body(Modifier.align(Alignment.Center), viewModel = viewModel, navController = navController)
         Footer(Modifier.align(Alignment.BottomCenter))
     }
 }

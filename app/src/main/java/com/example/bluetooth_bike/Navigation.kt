@@ -21,7 +21,7 @@ fun Navigation() {
         startDestination = Routes.LoginScreen.routes
     ) {
         composable(Routes.DevicesScreen.routes) { DevicesScaffold(navigationController) }
-        composable(Routes.LoginScreen.routes) { LoginScreen(navigationController, LoginViewModel()) }
+        composable(Routes.LoginScreen.routes) { LoginScreen(navigationController) }
     }
 }
 
