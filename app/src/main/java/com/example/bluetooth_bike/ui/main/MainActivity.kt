@@ -1,4 +1,4 @@
-package com.example.bluetooth_bike.main
+package com.example.bluetooth_bike.ui.main
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
@@ -19,7 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
-import com.example.bluetooth_bike.Navigation
+import com.example.bluetooth_bike.ui.Navigation
 import com.example.bluetooth_bike.ui.theme.Bluetooth_bikeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -113,6 +113,6 @@ private fun getPairedDevices(bluetoothAdapter: BluetoothAdapter) : Set<Bluetooth
 @Composable
 fun GreetingPreview() {
     Bluetooth_bikeTheme {
-        //
+        Navigation()
     }
 }

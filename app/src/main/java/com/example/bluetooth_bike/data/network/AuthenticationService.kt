@@ -1,4 +1,4 @@
-package com.example.bluetooth_bike.network
+package com.example.bluetooth_bike.data.network
 
 import android.util.Log
 import com.google.firebase.auth.ktx.auth
@@ -6,7 +6,6 @@ import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
 import javax.inject.Inject
 import javax.inject.Singleton
-
 
 //sealed class for the different types of errors
 sealed class AuthError {
@@ -18,7 +17,7 @@ sealed class AuthError {
 
 @Singleton
 class AuthenticationService @Inject constructor(
-    private val firebase: FirebaseClient,
+    private val firebase: FirebaseClient
 ) {
 
     companion object {

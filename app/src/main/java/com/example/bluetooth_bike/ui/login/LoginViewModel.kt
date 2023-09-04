@@ -1,12 +1,14 @@
-package com.example.bluetooth_bike.login
+package com.example.bluetooth_bike.ui.login
 
 import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.bluetooth_bike.network.FirebaseClient
+import com.example.bluetooth_bike.data.network.FirebaseClient
+import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
+@HiltViewModel
 class LoginViewModel @Inject constructor(
     private val firebase: FirebaseClient
 
@@ -24,11 +26,9 @@ class LoginViewModel @Inject constructor(
     fun onLoginChanged(email: String, password: String) {
         _email.value = email
         _password.value = password
-
         _isLoginEnabled.value = enableLogin(email, password)
     }
 
     fun enableLogin(email: String, password: String) =
         Patterns.EMAIL_ADDRESS.matcher(email).matches() && password.length > 6
-
 }

@@ -1,4 +1,4 @@
-package com.example.bluetooth_bike
+package com.example.bluetooth_bike.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,14 +29,13 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DevicesScaffold(navigationController: NavHostController) {
+fun DevicesScreen(navigationController: NavHostController) {
 
     val snackBarHostState = remember { SnackbarHostState() }
 
     Scaffold(
-        topBar = { TopAppBar(navigationController) },
+        topBar = { DevicesTopAppBar(/*navigationController*/) },
         floatingActionButtonPosition = FabPosition.End,
         snackbarHost = { SnackbarHost(snackBarHostState) },
         floatingActionButton = { FloatingActionButton(snackBarHostState) },
@@ -76,9 +75,10 @@ fun FloatingActionButton(snackBarHostState: SnackbarHostState) {
     ) { Text("Show snack-bar") }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBar(navHostController: NavHostController) {
+fun DevicesTopAppBar(/*navHostController: NavHostController*/) {
     TopAppBar(
         title = { Text("Connect device") },
         navigationIcon = {

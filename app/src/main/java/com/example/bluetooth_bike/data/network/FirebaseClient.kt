@@ -1,4 +1,4 @@
-package com.example.bluetooth_bike.network
+package com.example.bluetooth_bike.data.network
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase

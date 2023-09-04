@@ -82,6 +82,7 @@ dependencies {
     //firebase
     implementation("com.google.firebase:firebase-auth-ktx:22.1.1")
     implementation("com.google.firebase:firebase-database-ktx:20.2.2")
+    implementation("com.google.firebase:firebase-common-ktx:20.3.3")
 
     //testing
     testImplementation("junit:junit:4.13.2")
