@@ -74,6 +74,7 @@ dependencies {
 
     //dagger hilt
     implementation("com.google.dagger:hilt-android:2.48")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     kapt("com.google.dagger:hilt-compiler:2.48")
 
     //viewModel()
