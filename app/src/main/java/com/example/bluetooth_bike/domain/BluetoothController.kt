@@ -17,6 +17,8 @@ interface BluetoothController {
     fun startBluetoothServer(): Flow<ConnectionResult>
     fun connectToDevice(device: BtDevice): Flow<ConnectionResult>
 
+    suspend fun trySendMessage(message : String) : BluetoothMessage?
+
     fun closeConnection()
     fun release()
 }

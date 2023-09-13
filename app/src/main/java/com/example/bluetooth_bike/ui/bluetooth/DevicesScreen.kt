@@ -66,7 +66,7 @@ fun DevicesScreen(
     //val viewModel: BluetoothViewModel = viewModel()
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
-    viewModel.startScan()
+
 
     LaunchedEffect(key1 = state.errorMessage) {
         state.errorMessage?.let { message ->
@@ -170,8 +170,14 @@ fun DevicesList(
     LazyColumn(
         modifier.fillMaxWidth(),
 
-    ) {
-        stickyHeader { Text(text = title, modifier.padding(start = 5.dp, bottom = 5.dp), fontSize = 15.sp) }
+        ) {
+        stickyHeader {
+            Text(
+                text = title,
+                modifier.padding(start = 5.dp, bottom = 5.dp),
+                fontSize = 15.sp
+            )
+        }
         items(pairedDevices) { device ->
             DeviceItem(device, onClick)
         }
@@ -193,10 +199,11 @@ fun DeviceItem(device: BtDevice, onClick: (BtDevice) -> Unit) {
                 .height(50.dp)
         ) {
             DeviceImage()
-            Column (
+            Column(
                 Modifier
                     .padding(start = 12.dp)
-                    .weight(1f) ) {
+                    .weight(1f)
+            ) {
                 Text(
                     text = device.name ?: "Unknown",
                     modifier = Modifier
@@ -250,21 +257,24 @@ fun FloatingActionButton(
 
     ExtendedFloatingActionButton(
         onClick = {
-
             viewModel.scanToggle()
             scope.launch {
                 if (!state.isScanning)
                     snackBarHostState.showSnackbar("Scanning bluetooth devices")
             }
-        }
+        }, modifier = Modifier.height(50.dp)
     ) {
-        val stateStr: String = if (state.isScanning)
-            "Stop scanning"
-        else
-            "Scan"
-        Text(stateStr)
+
+        Row(horizontalArrangement = Arrangement.Center) {
+            if (state.isScanning) {
+                CircularProgressIndicator(Modifier.size(20.dp))
+                Text("Scanning", Modifier.padding(start = 10.dp, end = 10.dp))
+            } else
+                Text("Scan devices", Modifier.padding(start = 10.dp, end = 10.dp))
+        }
     }
 }
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -300,15 +310,5 @@ fun DevicesTopAppBar(/*navHostController: NavHostController*/ viewModel: Bluetoo
 
             )
         },
-    )
-}
-
-@Composable
-fun Title(title: String) {
-    Text(
-        text = title,
-        fontWeight = FontWeight.Medium,
-        fontSize = 18.sp,
-        modifier = Modifier.padding(16.dp)
     )
 }

@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,7 +34,8 @@ class BluetoothViewModel @Inject constructor(
         state.copy(
             scannedDevices = scannedDevices,
             pairedDevices = pairedDevices,
-            isScanning = isScanning
+            isScanning = isScanning,
+            messages = if (state.isConnected) state.messages else emptyList()
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _state.value)
 
@@ -49,6 +51,8 @@ class BluetoothViewModel @Inject constructor(
                 errorMessage = error
             ) }
         }.launchIn(viewModelScope)
+
+        startScan()
     }
 
     fun connectToDevice(device: BluetoothDeviceDomain) {
@@ -81,11 +85,22 @@ class BluetoothViewModel @Inject constructor(
             startScan()
     }
 
-    fun startScan() {
+    fun sendMessage(message: String) {
+        viewModelScope.launch {
+            val bluetoothMessage = bluetoothController.trySendMessage(message)
+            if(bluetoothMessage != null) {
+                _state.update { it.copy(
+                    messages = it.messages + bluetoothMessage
+                ) }
+            }
+        }
+    }
+
+    private fun startScan() {
         bluetoothController.startDiscovery()
     }
 
-    fun stopScan() {
+    private fun stopScan() {
         bluetoothController.stopDiscovery()
     }
 
@@ -98,6 +113,11 @@ class BluetoothViewModel @Inject constructor(
                         isConnected = true,
                         isConnecting = false,
                         errorMessage = null
+                    ) }
+                }
+                is ConnectionResult.TransferSucceeded -> {
+                    _state.update { it.copy(
+                        messages = it.messages + result.message
                     ) }
                 }
                 is ConnectionResult.Error -> {
