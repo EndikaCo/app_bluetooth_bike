@@ -3,9 +3,9 @@ package com.example.bluetooth_bike.domain
 import android.bluetooth.BluetoothClass
 
 
-typealias BluetoothDeviceDomain = BluetoothDevice
+typealias BluetoothDeviceDomain = BtDevice
 
-data class BluetoothDevice(
+data class BtDevice(
     val name: String?,
     val address: String,
     val btType: Int,

@@ -3,6 +3,7 @@ package com.example.bluetooth_bike.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -18,9 +19,9 @@ sealed class Routes(val routes:String){
 }
 
 @Composable
-fun Navigation(viewModel: BluetoothViewModel) {
+fun Navigation() {
     val navigationController = rememberNavController()
-
+    val viewModel: BluetoothViewModel = viewModel()
 
     NavHost(
         navController = navigationController,
@@ -28,14 +29,9 @@ fun Navigation(viewModel: BluetoothViewModel) {
     ) {
         composable(Routes.DevicesScreen.routes) {
 
-            //val viewModel: BluetoothViewModel = viewModel()
-            // val viewModel: BluetoothViewModel by viewModels()
-            val state by viewModel.state.collectAsState()
 
-            DevicesScreen(navigationController,state = state,
-            onStartScan = viewModel::startScan,
-            onStopScan = viewModel::stopScan)
-        }
+
+            DevicesScreen(/*navigationController*/viewModel) }
         composable(Routes.LoginScreen.routes) { LoginScreen(navigationController) }
         composable(Routes.SignInScreen.routes) { SignUpScreen(navigationController) }
     }

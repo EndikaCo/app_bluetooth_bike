@@ -1,5 +1,9 @@
 package com.example.bluetooth_bike.ui.bluetooth
 
+import android.bluetooth.BluetoothDevice
+import android.graphics.Paint.Style
+import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,7 +26,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -35,52 +39,71 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.example.bluetooth_bike.R
-import com.example.bluetooth_bike.domain.BluetoothDevice
+import com.example.bluetooth_bike.domain.BtDevice
 import kotlinx.coroutines.launch
 
 @Composable
 fun DevicesScreen(
-    navigationController: NavHostController,
-    state: BluetoothUiState,
-    onStartScan: () -> Unit,
-    onStopScan: () -> Unit
+    viewModel: BluetoothViewModel
+    /*navigationController: NavHostController*/
 ) {
+    //val viewModel: BluetoothViewModel = viewModel()
+    val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
+    viewModel.startScan()
+
+    LaunchedEffect(key1 = state.errorMessage) {
+        state.errorMessage?.let { message ->
+            Toast.makeText(
+                context,
+                message,
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
+    LaunchedEffect(key1 = state.isConnected) {
+        if (state.isConnected) {
+            Toast.makeText(
+                context,
+                "You're connected!",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
 
     val snackBarHostState = remember { SnackbarHostState() }
 
     Scaffold(
-        topBar = { DevicesTopAppBar(/*navigationController*/) },
+        topBar = { DevicesTopAppBar(viewModel) },
         floatingActionButtonPosition = FabPosition.End,
         snackbarHost = { SnackbarHost(snackBarHostState) },
         floatingActionButton = {
             FloatingActionButton(
-                snackBarHostState,
-                onStartScan,
-                onStopScan,
-                state
+                snackBarHostState, viewModel, state
             )
         },
         content = { innerPadding ->
             DevicesContent(
                 innerPadding,
-                pairedDevices = state.pairedDevices,
-                scannedDevices = state.scannedDevices,
-                onClick = {}
+                state = state,
+                onClick = { viewModel.connectToDevice(device = it) }
             )
         }
     )
@@ -88,51 +111,67 @@ fun DevicesScreen(
 
 @Composable
 fun DevicesContent(
-    innerPadding: PaddingValues, pairedDevices: List<BluetoothDevice>,
-    scannedDevices: List<BluetoothDevice>,
-    onClick: (BluetoothDevice) -> Unit,
+    innerPadding: PaddingValues, state: BluetoothUiState,
+    onClick: (BtDevice) -> Unit,
 ) {
+    when {
+        state.isConnecting -> {
+            ConnexionProgressBar()
+        }
 
-    Column(Modifier.fillMaxSize()) {
+        else -> {
+            Column(Modifier.fillMaxSize()) {
 
-        Spacer(modifier = Modifier.padding(innerPadding))
+                Spacer(modifier = Modifier.padding(innerPadding))
 
-        DevicesContainer(
-            "Paired devices",
-            Modifier
-                .padding(16.dp)
-                .weight(0.5F)
-                .clip(RoundedCornerShape(16.dp)) // Add rounded corners
-            , pairedDevices, onClick
-        )
-        DevicesContainer(
-            "Scanned devices",
-            Modifier
-                .padding(16.dp)
-                .weight(1F)
-                .clip(RoundedCornerShape(16.dp)) // Add rounded corners
-            , scannedDevices, onClick
-        )
+                DevicesList(
+                    "Paired devices",
+                    Modifier
+                        .padding(start = 16.dp, end = 16.dp)
+                        .weight(0.5F)
+                        .clip(RoundedCornerShape(16.dp)) // Add rounded corners
+                    , state.pairedDevices, onClick
+                )
+                DevicesList(
+                    "Scanned devices",
+                    Modifier
+                        .padding(start = 16.dp, end = 16.dp)
+                        .weight(1F)
+                        .clip(RoundedCornerShape(16.dp)) // Add rounded corners
+                    , state.scannedDevices, onClick
+                )
 
-        Spacer(modifier = Modifier.padding(innerPadding))
+                Spacer(modifier = Modifier.padding(innerPadding))
+            }
+        }
     }
 }
 
 @Composable
-fun DevicesContainer(
+fun ConnexionProgressBar() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        CircularProgressIndicator()
+        Text(text = "Connecting...")
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun DevicesList(
     title: String,
     modifier: Modifier,
-    pairedDevices: List<BluetoothDevice>,
-    onClick: (BluetoothDevice) -> Unit
+    pairedDevices: List<BtDevice>,
+    onClick: (BtDevice) -> Unit
 ) {
     LazyColumn(
         modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
+
     ) {
-        item {
-            Title(title)
-        }
+        stickyHeader { Text(text = title, modifier.padding(start = 5.dp, bottom = 5.dp), fontSize = 15.sp) }
         items(pairedDevices) { device ->
             DeviceItem(device, onClick)
         }
@@ -140,69 +179,43 @@ fun DevicesContainer(
 }
 
 @Composable
-fun Title(title: String) {
-    Text(
-        text = title,
-        fontWeight = FontWeight.Medium,
-        fontSize = 18.sp,
-        modifier = Modifier.padding(16.dp)
-    )
-}
-
-@Composable
-fun DeviceItem(device: BluetoothDevice, onClick: (BluetoothDevice) -> Unit) {
+fun DeviceItem(device: BtDevice, onClick: (BtDevice) -> Unit) {
 
     ElevatedCard(
         modifier = Modifier
             .padding(bottom = 5.dp)
             .fillMaxWidth()
+            .clickable { onClick(device) }
     ) {
         Row(
             modifier = Modifier
                 .padding(start = 15.dp, end = 15.dp, top = 5.dp, bottom = 5.dp)
                 .height(50.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(50.dp) // Size of the Box (background)
-                    .background(Color.Gray, CircleShape) // Round background
-                    .align(Alignment.CenterVertically), // Center vertically in the Row
-                contentAlignment = Alignment.Center // Center content in the Box
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ebike_24),
-                    contentDescription = "logo",
-                    modifier = Modifier
-                        .height(30.dp)
-                        .width(30.dp)
-                )
-            }
-            Column(
+            DeviceImage()
+            Column (
                 Modifier
                     .padding(start = 12.dp)
-                    .weight(1f)
-            ) {
+                    .weight(1f) ) {
                 Text(
                     text = device.name ?: "Unknown",
                     modifier = Modifier
                         .height(25.dp)
-                        .clickable { onClick(device) }
                 )
                 Text(
                     text = device.address,
                     modifier = Modifier
                         .height(25.dp)
-                        .clickable { onClick(device) }
                 )
             }
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .align(Alignment.CenterVertically), // Size of the Box (background)
+                    .align(Alignment.CenterVertically),
                 contentAlignment = Alignment.CenterEnd, // Center content in the Box
 
             ) {
-                if (device.btType == 2)
+                if (device.btType == BluetoothDevice.DEVICE_TYPE_LE)
                     Text(text = "BLE", color = Color(0xFF249696), fontSize = 12.sp)
             }
         }
@@ -210,22 +223,35 @@ fun DeviceItem(device: BluetoothDevice, onClick: (BluetoothDevice) -> Unit) {
 }
 
 @Composable
+fun DeviceImage() {
+    Box(
+        modifier = Modifier
+            .size(50.dp) // Size of the Box (background)
+            .background(Color.Gray, CircleShape) // Round background
+        , contentAlignment = Alignment.Center // Center content in the Box
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ebike_24),
+            contentDescription = "logo",
+            modifier = Modifier
+                .height(30.dp)
+                .width(30.dp)
+        )
+    }
+}
+
+@Composable
 fun FloatingActionButton(
     snackBarHostState: SnackbarHostState,
-    onStartScan: () -> Unit,
-    onStopScan: () -> Unit,
+    viewModel: BluetoothViewModel,
     state: BluetoothUiState
 ) {
-
     val scope = rememberCoroutineScope()
 
     ExtendedFloatingActionButton(
         onClick = {
-            if (state.isScanning)
-                onStopScan()
-            else
-                onStartScan()
-            // show snack-bar as a suspend function
+
+            viewModel.scanToggle()
             scope.launch {
                 if (!state.isScanning)
                     snackBarHostState.showSnackbar("Scanning bluetooth devices")
@@ -243,7 +269,7 @@ fun FloatingActionButton(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DevicesTopAppBar(/*navHostController: NavHostController*/) {
+fun DevicesTopAppBar(/*navHostController: NavHostController*/ viewModel: BluetoothViewModel) {
     TopAppBar(
         title = {
             Text(
@@ -254,16 +280,35 @@ fun DevicesTopAppBar(/*navHostController: NavHostController*/) {
             )
         },
         navigationIcon = {
-            IconButton(
-                onClick = { /*TODO navHostController.navigate */ }
-            ) {
+            IconButton(onClick = { /*TODO navHostController.navigate */ }) {
                 Icon(Icons.Filled.KeyboardArrowLeft, contentDescription = "Go back")
             }
         },
         actions = {
-            IconButton(onClick = { /*TODO: settings */ }) {
-                Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings")
-            }
+            //IconButton(onClick = { /*TODO: settings */ }) {
+            //    Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings")
+            //}
+            Text(
+                text = "start\nserver",
+                Modifier
+                    .clickable { viewModel.waitForIncomingConnections() }
+                    .padding(end = 10.dp),
+                color = Color(0xFF7A7A7A),
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center,
+                lineHeight = 15.sp
+
+            )
         },
+    )
+}
+
+@Composable
+fun Title(title: String) {
+    Text(
+        text = title,
+        fontWeight = FontWeight.Medium,
+        fontSize = 18.sp,
+        modifier = Modifier.padding(16.dp)
     )
 }

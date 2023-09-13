@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,6 +14,7 @@ import androidx.activity.viewModels
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.bluetooth_bike.ui.bluetooth.BluetoothViewModel
 import com.example.bluetooth_bike.ui.Navigation
@@ -26,7 +28,7 @@ class MainActivity : ComponentActivity() {
         const val TAG = "*** MainActivity"
     }
 
-    private val viewModel: BluetoothViewModel by viewModels()
+    private val viewModel: MainActivityViewModel by viewModels()
 
     private val bluetoothManager by lazy { applicationContext.getSystemService(BluetoothManager::class.java) }
     private val bluetoothAdapter by lazy { bluetoothManager?.adapter }
@@ -43,7 +45,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Navigation(viewModel)
+                    Navigation()
                 }
             }
         }
@@ -75,10 +77,4 @@ class MainActivity : ComponentActivity() {
             )
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-
 }
