@@ -1,4 +1,4 @@
-package com.example.bluetooth_bike.ui.main
+package com.example.bluetooth_bike.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import com.example.bluetooth_bike.data.network.FirebaseClient

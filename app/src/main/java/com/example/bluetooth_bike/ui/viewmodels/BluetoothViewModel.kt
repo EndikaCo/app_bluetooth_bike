@@ -1,10 +1,11 @@
-package com.example.bluetooth_bike.ui.bluetooth
+package com.example.bluetooth_bike.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bluetooth_bike.domain.BluetoothController
 import com.example.bluetooth_bike.domain.BluetoothDeviceDomain
 import com.example.bluetooth_bike.domain.ConnectionResult
+import com.example.bluetooth_bike.ui.bluetooth.BluetoothUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow

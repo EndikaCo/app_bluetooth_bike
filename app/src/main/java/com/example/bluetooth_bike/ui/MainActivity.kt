@@ -1,4 +1,4 @@
-package com.example.bluetooth_bike.ui.main
+package com.example.bluetooth_bike.ui
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
@@ -6,19 +6,15 @@ import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.bluetooth_bike.ui.bluetooth.BluetoothViewModel
-import com.example.bluetooth_bike.ui.Navigation
+import com.example.bluetooth_bike.ui.navigation.NavGraph
 import com.example.bluetooth_bike.ui.theme.Bluetooth_bikeTheme
+import com.example.bluetooth_bike.ui.viewmodels.MainActivityViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -45,7 +41,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Navigation()
+                    NavGraph()
                 }
             }
         }

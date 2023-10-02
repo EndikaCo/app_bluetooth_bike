@@ -1,7 +1,6 @@
 package com.example.bluetooth_bike.ui.bluetooth
 
 import android.bluetooth.BluetoothDevice
-import android.graphics.Paint.Style
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -50,12 +49,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bluetooth_bike.R
 import com.example.bluetooth_bike.domain.BtDevice
+import com.example.bluetooth_bike.ui.viewmodels.BluetoothViewModel
 import kotlinx.coroutines.launch
 
 @Composable
