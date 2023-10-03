@@ -1,4 +1,4 @@
-package com.example.bluetooth_bike.domain
+package com.example.bluetooth_bike.data.model
 
 data class BluetoothMessage(
     val message: String,

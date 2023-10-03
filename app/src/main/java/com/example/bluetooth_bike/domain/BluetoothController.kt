@@ -1,5 +1,7 @@
 package com.example.bluetooth_bike.domain
 
+import com.example.bluetooth_bike.data.model.BluetoothMessage
+import com.example.bluetooth_bike.data.model.BtDevice
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -1,4 +1,4 @@
-package com.example.bluetooth_bike.ui.bluetooth
+package com.example.bluetooth_bike.ui.screens
 
 import android.bluetooth.BluetoothDevice
 import android.widget.Toast
@@ -39,8 +39,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -53,19 +51,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bluetooth_bike.R
-import com.example.bluetooth_bike.domain.BtDevice
-import com.example.bluetooth_bike.ui.viewmodels.BluetoothViewModel
+import com.example.bluetooth_bike.data.model.BtDevice
+import com.example.bluetooth_bike.data.model.BluetoothUiState
 import kotlinx.coroutines.launch
 
 @Composable
 fun DevicesScreen(
-    viewModel: BluetoothViewModel
-    /*navigationController: NavHostController*/
+    state: BluetoothUiState,
+    onStartServer: () -> Unit,
+    onDeviceClick: (BtDevice) -> Unit,
+    onScanClick: () -> Unit
 ) {
-    //val viewModel: BluetoothViewModel = viewModel()
-    val state by viewModel.state.collectAsState()
     val context = LocalContext.current
-
 
     LaunchedEffect(key1 = state.errorMessage) {
         state.errorMessage?.let { message ->
@@ -90,20 +87,12 @@ fun DevicesScreen(
     val snackBarHostState = remember { SnackbarHostState() }
 
     Scaffold(
-        topBar = { DevicesTopAppBar(viewModel) },
+        topBar = { DevicesTopAppBar(onStartServer) },
         floatingActionButtonPosition = FabPosition.End,
         snackbarHost = { SnackbarHost(snackBarHostState) },
-        floatingActionButton = {
-            FloatingActionButton(
-                snackBarHostState, viewModel, state
-            )
-        },
+        floatingActionButton = { FloatingActionButton(snackBarHostState, onScanClick, state) },
         content = { innerPadding ->
-            DevicesContent(
-                innerPadding,
-                state = state,
-                onClick = { viewModel.connectToDevice(device = it) }
-            )
+            DevicesContent(innerPadding, state = state, onClick = { onDeviceClick(it) })
         }
     )
 }
@@ -113,48 +102,27 @@ fun DevicesContent(
     innerPadding: PaddingValues, state: BluetoothUiState,
     onClick: (BtDevice) -> Unit,
 ) {
-    when {
-        state.isConnecting -> {
-            ConnexionProgressBar()
-        }
+    Column(Modifier.fillMaxSize()) {
 
-        else -> {
-            Column(Modifier.fillMaxSize()) {
+        Spacer(modifier = Modifier.padding(innerPadding))
 
-                Spacer(modifier = Modifier.padding(innerPadding))
-
-                DevicesList(
-                    "Paired devices",
-                    Modifier
-                        .padding(start = 16.dp, end = 16.dp)
-                        .weight(0.5F)
-                        .clip(RoundedCornerShape(16.dp)) // Add rounded corners
-                    , state.pairedDevices, onClick
-                )
-                DevicesList(
-                    "Scanned devices",
-                    Modifier
-                        .padding(start = 16.dp, end = 16.dp)
-                        .weight(1F)
-                        .clip(RoundedCornerShape(16.dp)) // Add rounded corners
-                    , state.scannedDevices, onClick
-                )
-
-                Spacer(modifier = Modifier.padding(innerPadding))
-            }
-        }
-    }
-}
-
-@Composable
-fun ConnexionProgressBar() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        CircularProgressIndicator()
-        Text(text = "Connecting...")
+        DevicesList(
+            "Paired devices",
+            Modifier
+                .padding(start = 16.dp, end = 16.dp)
+                .weight(0.5F)
+                .clip(RoundedCornerShape(16.dp)) // Add rounded corners
+            , state.pairedDevices, onClick
+        )
+        DevicesList(
+            "Scanned devices",
+            Modifier
+                .padding(start = 16.dp, end = 16.dp)
+                .weight(1F)
+                .clip(RoundedCornerShape(16.dp)) // Add rounded corners
+            , state.scannedDevices, onClick
+        )
+        Spacer(modifier = Modifier.padding(innerPadding))
     }
 }
 
@@ -166,16 +134,9 @@ fun DevicesList(
     pairedDevices: List<BtDevice>,
     onClick: (BtDevice) -> Unit
 ) {
-    LazyColumn(
-        modifier.fillMaxWidth(),
-
-        ) {
+    LazyColumn(modifier.fillMaxWidth()) {
         stickyHeader {
-            Text(
-                text = title,
-                modifier.padding(start = 5.dp, bottom = 5.dp),
-                fontSize = 15.sp
-            )
+            Text(title, modifier.padding(start = 5.dp, bottom = 5.dp), fontSize = 15.sp)
         }
         items(pairedDevices) { device ->
             DeviceItem(device, onClick)
@@ -232,9 +193,9 @@ fun DeviceItem(device: BtDevice, onClick: (BtDevice) -> Unit) {
 fun DeviceImage() {
     Box(
         modifier = Modifier
-            .size(50.dp) // Size of the Box (background)
-            .background(Color.Gray, CircleShape) // Round background
-        , contentAlignment = Alignment.Center // Center content in the Box
+            .size(50.dp)
+            .background(Color.Gray, CircleShape),
+        contentAlignment = Alignment.Center
     ) {
         Image(
             painter = painterResource(id = R.drawable.ebike_24),
@@ -249,21 +210,20 @@ fun DeviceImage() {
 @Composable
 fun FloatingActionButton(
     snackBarHostState: SnackbarHostState,
-    viewModel: BluetoothViewModel,
+    onScanClick: () -> Unit,
     state: BluetoothUiState
 ) {
     val scope = rememberCoroutineScope()
 
     ExtendedFloatingActionButton(
         onClick = {
-            viewModel.scanToggle()
+            onScanClick()
             scope.launch {
-                if (!state.isScanning)
+                if (state.isScanning)
                     snackBarHostState.showSnackbar("Scanning bluetooth devices")
             }
         }, modifier = Modifier.height(50.dp)
     ) {
-
         Row(horizontalArrangement = Arrangement.Center) {
             if (state.isScanning) {
                 CircularProgressIndicator(Modifier.size(20.dp))
@@ -275,10 +235,11 @@ fun FloatingActionButton(
 }
 
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DevicesTopAppBar(/*navHostController: NavHostController*/ viewModel: BluetoothViewModel) {
+fun DevicesTopAppBar(
+    onStartServer: () -> Unit
+) {
     TopAppBar(
         title = {
             Text(
@@ -294,13 +255,10 @@ fun DevicesTopAppBar(/*navHostController: NavHostController*/ viewModel: Bluetoo
             }
         },
         actions = {
-            //IconButton(onClick = { /*TODO: settings */ }) {
-            //    Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings")
-            //}
             Text(
                 text = "start\nserver",
                 Modifier
-                    .clickable { viewModel.waitForIncomingConnections() }
+                    .clickable { onStartServer() }
                     .padding(end = 10.dp),
                 color = Color(0xFF7A7A7A),
                 fontSize = 16.sp,

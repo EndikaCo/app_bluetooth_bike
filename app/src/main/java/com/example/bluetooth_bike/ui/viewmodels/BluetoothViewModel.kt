@@ -3,9 +3,9 @@ package com.example.bluetooth_bike.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bluetooth_bike.domain.BluetoothController
-import com.example.bluetooth_bike.domain.BluetoothDeviceDomain
 import com.example.bluetooth_bike.domain.ConnectionResult
-import com.example.bluetooth_bike.ui.bluetooth.BluetoothUiState
+import com.example.bluetooth_bike.data.model.BluetoothUiState
+import com.example.bluetooth_bike.data.model.BtDevice
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -56,7 +56,7 @@ class BluetoothViewModel @Inject constructor(
         startScan()
     }
 
-    fun connectToDevice(device: BluetoothDeviceDomain) {
+    fun connectToDevice(device: BtDevice) {
         _state.update { it.copy(isConnecting = true) }
         deviceConnectionJob = bluetoothController
             .connectToDevice(device)
@@ -77,6 +77,13 @@ class BluetoothViewModel @Inject constructor(
         deviceConnectionJob = bluetoothController
             .startBluetoothServer()
             .listen()
+    }
+
+    fun cancelServer(){
+        deviceConnectionJob?.cancel()
+        _state.update { it.copy(
+            isConnecting = false,
+        ) }
     }
 
     fun scanToggle(){
@@ -105,7 +112,6 @@ class BluetoothViewModel @Inject constructor(
         bluetoothController.stopDiscovery()
     }
 
-
     private fun Flow<ConnectionResult>.listen(): Job {
         return onEach { result ->
             when(result) {
@@ -130,7 +136,7 @@ class BluetoothViewModel @Inject constructor(
                 }
             }
         }
-            .catch { throwable ->
+            .catch {
                 bluetoothController.closeConnection()
                 _state.update { it.copy(
                     isConnected = false,

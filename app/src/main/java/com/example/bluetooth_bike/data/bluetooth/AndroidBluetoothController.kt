@@ -13,8 +13,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import com.example.bluetooth_bike.domain.BluetoothController
-import com.example.bluetooth_bike.domain.BluetoothDeviceDomain
-import com.example.bluetooth_bike.domain.BluetoothMessage
+import com.example.bluetooth_bike.data.model.BluetoothMessage
+import com.example.bluetooth_bike.data.model.BtDevice
 import com.example.bluetooth_bike.domain.ConnectionResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -45,12 +45,12 @@ class AndroidBluetoothController(
         bluetoothManager?.adapter
     }
 
-    private val _scannedDevices = MutableStateFlow<List<BluetoothDeviceDomain>>(emptyList())
-    override val scannedDevices: StateFlow<List<BluetoothDeviceDomain>>
+    private val _scannedDevices = MutableStateFlow<List<BtDevice>>(emptyList())
+    override val scannedDevices: StateFlow<List<BtDevice>>
         get() = _scannedDevices.asStateFlow()
 
-    private val _pairedDevices = MutableStateFlow<List<BluetoothDeviceDomain>>(emptyList())
-    override val pairedDevices: StateFlow<List<BluetoothDeviceDomain>>
+    private val _pairedDevices = MutableStateFlow<List<BtDevice>>(emptyList())
+    override val pairedDevices: StateFlow<List<BtDevice>>
         get() = _pairedDevices.asStateFlow()
 
     private val _isScanning = MutableStateFlow(false)
@@ -170,7 +170,7 @@ class AndroidBluetoothController(
         }.flowOn(Dispatchers.IO)
     }
 
-    override fun connectToDevice(device: BluetoothDeviceDomain): Flow<ConnectionResult> {
+    override fun connectToDevice(device: BtDevice): Flow<ConnectionResult> {
         return flow {
             if (!hasPermission(Manifest.permission.BLUETOOTH_CONNECT)) {
                 throw SecurityException("No BLUETOOTH_CONNECT permission")

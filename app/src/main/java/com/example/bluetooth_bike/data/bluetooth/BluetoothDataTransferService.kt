@@ -1,7 +1,7 @@
 package com.example.bluetooth_bike.data.bluetooth
 
 import android.bluetooth.BluetoothSocket
-import com.example.bluetooth_bike.domain.BluetoothMessage
+import com.example.bluetooth_bike.data.model.BluetoothMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
