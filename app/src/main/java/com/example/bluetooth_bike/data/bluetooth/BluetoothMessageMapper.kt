@@ -1,6 +1,6 @@
 package com.example.bluetooth_bike.data.bluetooth
 
-import com.example.bluetooth_bike.data.model.BluetoothMessage
+import com.example.bluetooth_bike.domain.model.BluetoothMessage
 
 fun String.toBluetoothMessage(isFromLocalUser: Boolean): BluetoothMessage {
     val name = substringBeforeLast("#")

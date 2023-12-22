@@ -12,10 +12,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import com.example.bluetooth_bike.domain.BluetoothController
-import com.example.bluetooth_bike.data.model.BluetoothMessage
-import com.example.bluetooth_bike.data.model.BtDevice
-import com.example.bluetooth_bike.domain.ConnectionResult
+import com.example.bluetooth_bike.domain.bluetooth.BluetoothController
+import com.example.bluetooth_bike.domain.model.BluetoothMessage
+import com.example.bluetooth_bike.domain.model.BtDevice
+import com.example.bluetooth_bike.domain.bluetooth.ConnectionResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

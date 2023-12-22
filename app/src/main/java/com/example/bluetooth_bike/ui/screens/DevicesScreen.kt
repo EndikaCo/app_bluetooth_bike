@@ -1,6 +1,7 @@
 package com.example.bluetooth_bike.ui.screens
 
 import android.bluetooth.BluetoothDevice
+import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -48,11 +49,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bluetooth_bike.R
-import com.example.bluetooth_bike.data.model.BtDevice
-import com.example.bluetooth_bike.data.model.BluetoothUiState
+import com.example.bluetooth_bike.domain.model.BtDevice
+import com.example.bluetooth_bike.domain.model.BluetoothUiState
+import com.example.bluetooth_bike.ui.theme.Bluetooth_bikeTheme
 import kotlinx.coroutines.launch
 
 @Composable
@@ -229,7 +232,7 @@ fun FloatingActionButton(
                 CircularProgressIndicator(Modifier.size(20.dp))
                 Text("Scanning", Modifier.padding(start = 10.dp, end = 10.dp))
             } else
-                Text("Scan devices", Modifier.padding(start = 10.dp, end = 10.dp))
+                Text("Scan new devices", Modifier.padding(start = 10.dp, end = 10.dp))
         }
     }
 }
@@ -268,4 +271,19 @@ fun DevicesTopAppBar(
             )
         },
     )
+}
+
+
+@Preview(name = "Light Mode")
+@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun DevicesScreenPreview() {
+    Bluetooth_bikeTheme {
+        DevicesScreen(
+            state = BluetoothUiState(),
+            onStartServer = {},
+            onDeviceClick = {},
+            onScanClick = {}
+        )
+    }
 }

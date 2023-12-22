@@ -1,6 +1,6 @@
-package com.example.bluetooth_bike.domain
+package com.example.bluetooth_bike.domain.bluetooth
 
-import com.example.bluetooth_bike.data.model.BluetoothMessage
+import com.example.bluetooth_bike.domain.model.BluetoothMessage
 
 sealed interface ConnectionResult {
     object ConnectionEstablished: ConnectionResult

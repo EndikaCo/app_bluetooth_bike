@@ -2,10 +2,10 @@ package com.example.bluetooth_bike.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bluetooth_bike.domain.BluetoothController
-import com.example.bluetooth_bike.domain.ConnectionResult
-import com.example.bluetooth_bike.data.model.BluetoothUiState
-import com.example.bluetooth_bike.data.model.BtDevice
+import com.example.bluetooth_bike.domain.bluetooth.BluetoothController
+import com.example.bluetooth_bike.domain.bluetooth.ConnectionResult
+import com.example.bluetooth_bike.domain.model.BluetoothUiState
+import com.example.bluetooth_bike.domain.model.BtDevice
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow

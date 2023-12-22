@@ -2,7 +2,7 @@ package com.example.bluetooth_bike.data.di
 
 import android.content.Context
 import com.example.bluetooth_bike.data.bluetooth.AndroidBluetoothController
-import com.example.bluetooth_bike.domain.BluetoothController
+import com.example.bluetooth_bike.domain.bluetooth.BluetoothController
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

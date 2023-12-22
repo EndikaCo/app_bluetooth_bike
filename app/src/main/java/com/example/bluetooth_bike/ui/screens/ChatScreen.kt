@@ -2,6 +2,7 @@
 
 package com.example.bluetooth_bike.ui.screens
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,8 +20,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.bluetooth_bike.data.model.BluetoothUiState
+import com.example.bluetooth_bike.domain.model.BluetoothUiState
+import com.example.bluetooth_bike.ui.theme.Bluetooth_bikeTheme
 
 @Composable
 fun ChatScreen(
@@ -101,5 +104,19 @@ fun ChatScreen(
                 )
             }
         }
+    }
+}
+
+
+@Preview(name = "Light Mode")
+@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun ChatScreenPreview() {
+    Bluetooth_bikeTheme {
+        ChatScreen(
+            BluetoothUiState(),
+            {},
+            {}
+        )
     }
 }

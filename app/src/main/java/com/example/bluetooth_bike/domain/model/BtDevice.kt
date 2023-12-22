@@ -1,4 +1,4 @@
-package com.example.bluetooth_bike.data.model
+package com.example.bluetooth_bike.domain.model
 
 import android.bluetooth.BluetoothClass
 
