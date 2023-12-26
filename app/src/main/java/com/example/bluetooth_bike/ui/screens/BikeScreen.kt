@@ -1,4 +1,3 @@
-@file:OptIn(ExperimentalComposeUiApi::class)
 
 package com.example.bluetooth_bike.ui.screens
 
@@ -13,11 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
@@ -29,15 +24,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import com.example.bluetooth_bike.domain.model.BluetoothMessage
 import com.example.bluetooth_bike.domain.model.BluetoothUiState
 import com.example.bluetooth_bike.domain.model.Point
+import com.example.bluetooth_bike.domain.model.TimeModel
 import com.example.bluetooth_bike.ui.components.MyBottomBar
 import com.example.bluetooth_bike.ui.components.MyTopBar
 import com.example.bluetooth_bike.ui.theme.Bluetooth_bikeTheme
-import kotlinx.coroutines.delay
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 @Composable
 fun BikeScreen(
@@ -47,15 +40,15 @@ fun BikeScreen(
     onLightClick: () -> Unit
 ) {
     Scaffold(
-        topBar = { MyTopBar(uiState, onDisconnect) },
+        topBar = { MyTopBar(uiState, onDisconnect, onSettingsClick = {/*todo*/ }) },
         bottomBar = { MyBottomBar(onStartClick, onLightClick) }
-    ) {
-        BikeScreenContent(it)
+    ) { innerPadding ->
+        BikeScreenContent(innerPadding, uiState)
     }
 }
 
 @Composable
-fun BikeScreenContent(innerPadding: PaddingValues) {
+fun BikeScreenContent(innerPadding: PaddingValues, uiState: BluetoothUiState) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -65,12 +58,12 @@ fun BikeScreenContent(innerPadding: PaddingValues) {
         verticalArrangement = Arrangement.SpaceBetween
     )
     {
-        DateInfoView()
+        DateInfoView(uiState.time)
         Divider(Modifier.padding(top = 10.dp, bottom = 20.dp))
-        BatteryInfoView(0.3f)
+        BatteryInfoView(uiState.values)
         Spacer(modifier = Modifier.padding(bottom = 4.dp))
         SpeedInfoView()
-        TripKmView("12","1234")
+        TripKmView(uiState.values.last().trip, uiState.values.last().total)
         Divider(Modifier.padding(top = 10.dp, bottom = 20.dp))
         BatteryChart()
         Spacer(modifier = Modifier.padding(bottom = 20.dp))
@@ -90,7 +83,6 @@ fun TripKmView(trip : String, total : String) {
 
         Text(text = "of", style = MaterialTheme.typography.titleSmall)
 
-
         Text(
             text = total,
             modifier = Modifier.padding(start = 20.dp),
@@ -104,13 +96,13 @@ fun TripKmView(trip : String, total : String) {
 fun BatteryChart() {
 
     val values = listOf(
-        Point(0f, 1f),
-        Point(1.5f, 1.2f),
-        Point(2f, 0.9f),
-        Point(2.5f, 2f),
-        Point(3f, 1.3f),
-        Point(3.5f, 3.2f),
-        Point(4f, 0.8f),
+        Point(1f, 60f),
+        Point(1.5f, 61f),
+        Point(2f, 63f),
+        Point(2.5f, 40f),
+        Point(3f, 35f),
+        Point(3.5f, 55f),
+        Point(4f, 50f),
     )
     SuperSimpleLineChart(Modifier.size(250.dp, 200.dp), values)
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -206,8 +198,20 @@ fun Float.mapValueToDifferentRange(
     outMax: Float
 ) = (this - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
 
+
+fun calculateBatteryPercentage(currentVoltage: Float, minVoltage: Float, maxVoltage: Float): Float {
+    return (currentVoltage - minVoltage) / (maxVoltage - minVoltage)
+}
+
 @Composable
-fun BatteryInfoView(batteryPercentage: Float) {
+fun BatteryInfoView(values: List<BluetoothMessage>) {
+
+    val voltage = values.last().voltage
+    val batteryPercentage = calculateBatteryPercentage(voltage.toFloat(), 40f, 67.2f)
+
+    val amperes = values.last().amperes
+    val watts = values.last().amperes.toFloat() * values.last().voltage.toFloat()
+
     val batteryColor = when {
         batteryPercentage >= 0.6f -> Color.Green
         batteryPercentage > 0.3f -> Color.Yellow
@@ -219,8 +223,8 @@ fun BatteryInfoView(batteryPercentage: Float) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(horizontalAlignment = Alignment.End) {
-            Text(text = "20.30A", textAlign = TextAlign.End)
-            Text(text = "150.65W", textAlign = TextAlign.End)
+            Text(text = "${amperes}A", textAlign = TextAlign.End)
+            Text(text = "${watts}W", textAlign = TextAlign.End)
         }
         LinearProgressIndicator(
             progress = batteryPercentage,
@@ -236,32 +240,17 @@ fun BatteryInfoView(batteryPercentage: Float) {
             Text(text = "50.65V")
         }
     }
-
 }
 
 @Composable
-fun DateInfoView() {
-    val currentDateTime = remember { mutableStateOf(getCurrentDateTime()) }
-
-    LaunchedEffect(key1 = currentDateTime) {
-        while (true) {
-            delay(60000) // delay for 1 minute
-            currentDateTime.value = getCurrentDateTime()
-        }
-    }
-
-    val dateTime = currentDateTime.value
-    val dayOfWeek = formatDayOfWeek(dateTime)
-    val dayOfMonth = dateTime.dayOfMonth.toString()
-    val month = formatMonth(dateTime)
-    val hour = formatHour(dateTime)
+fun DateInfoView(time: TimeModel) {
 
     ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
 
         val (dayId, hourId, monthId) = createRefs()
 
         Text(
-            text = dayOfWeek,
+            text = time.day,
             modifier = Modifier.constrainAs(dayId) {
                 start.linkTo(parent.start)
                 top.linkTo(parent.top)
@@ -270,7 +259,7 @@ fun DateInfoView() {
             },
         )
         Text(
-            text = hour,
+            text = time.hour,
             fontSize = 40.sp,
             modifier = Modifier.constrainAs(hourId) {
                 start.linkTo(parent.start)
@@ -280,7 +269,7 @@ fun DateInfoView() {
             }
         )
         Text(
-            text = "$month $dayOfMonth",
+            text = time.date,
             modifier = Modifier.constrainAs(monthId) {
                 start.linkTo(hourId.end)
                 end.linkTo(parent.end)
@@ -291,29 +280,10 @@ fun DateInfoView() {
     }
 }
 
-fun getCurrentDateTime(): LocalDateTime {
-    return LocalDateTime.now()
-}
-
-fun formatDayOfWeek(datetime: LocalDateTime): String {
-    val formatter = DateTimeFormatter.ofPattern("EEE")
-    return datetime.format(formatter).uppercase(Locale.getDefault())
-}
-
-fun formatHour(dateTime: LocalDateTime): String {
-    val formatter = DateTimeFormatter.ofPattern("HH:mm")
-    return dateTime.format(formatter)
-}
-
-fun formatMonth(dateTime: LocalDateTime): String {
-    val formatter = DateTimeFormatter.ofPattern("MMM")
-    return dateTime.format(formatter).uppercase(Locale.getDefault())
-}
-
 @Composable
-fun SpeedInfoView() {
+fun SpeedInfoView(speed : String = "00") {
     Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.Center) {
-        Text(text = "56", fontSize = 120.sp, modifier = Modifier.padding(start = 50.dp))
+        Text(text = speed, fontSize = 120.sp, modifier = Modifier.padding(start = 50.dp))
         Text(
             text = "km/h",
             fontSize = 15.sp,
@@ -330,7 +300,9 @@ fun SpeedInfoView() {
 fun BikeScreenPreview() {
     Bluetooth_bikeTheme {
         BikeScreen(
-            BluetoothUiState(),
+            BluetoothUiState(time = TimeModel("Mon", "12:00", "12 Jan"), values = listOf(
+                BluetoothMessage("60", "0", "00", "100", "1233", "Ebike01", false),
+            )),
             {},
             {},
             {}

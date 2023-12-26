@@ -34,7 +34,7 @@ import java.io.IOException
 import java.util.UUID
 
 @SuppressLint("MissingPermission")
-class AndroidBluetoothController(
+class BluetoothController(
     private val context: Context
 ) : BluetoothController {
 
@@ -202,11 +202,7 @@ class AndroidBluetoothController(
         if (!hasPermission(Manifest.permission.BLUETOOTH_CONNECT))
             return null
 
-        val bluetoothMessage = BluetoothMessage(
-            message = message,
-            senderName = bluetoothAdapter?.name ?: "Unknown name",
-            isFromLocalUser = true
-        )
+        val bluetoothMessage = message.toBluetoothMessage(isFromLocalUser = true)
 
         dataTransferService?.sendMessage(bluetoothMessage.toByteArray())
 

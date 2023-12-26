@@ -71,6 +71,6 @@ const val color = 0xFFFFFFFF
 @Composable
 fun PreviewMyBottomBar() {
     Bluetooth_bikeTheme {
-        MyBottomBar(onStartClick, onLightClick)
+        MyBottomBar({}, {})
     }
 }

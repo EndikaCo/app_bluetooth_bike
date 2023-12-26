@@ -3,7 +3,6 @@ package com.example.bluetooth_bike.ui.screens
 import android.bluetooth.BluetoothDevice
 import android.content.res.Configuration
 import android.widget.Toast
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -105,23 +104,23 @@ fun DevicesContent(
     innerPadding: PaddingValues, state: BluetoothUiState,
     onClick: (BtDevice) -> Unit,
 ) {
-    Column(Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
 
         Spacer(modifier = Modifier.padding(innerPadding))
-
         DevicesList(
-            "Paired devices",
+            "Paired",
             Modifier
                 .padding(start = 16.dp, end = 16.dp)
-                .weight(0.5F)
                 .clip(RoundedCornerShape(16.dp)) // Add rounded corners
             , state.pairedDevices, onClick
         )
         DevicesList(
-            "Scanned devices",
+            "Scanned",
             Modifier
                 .padding(start = 16.dp, end = 16.dp)
-                .weight(1F)
                 .clip(RoundedCornerShape(16.dp)) // Add rounded corners
             , state.scannedDevices, onClick
         )
@@ -129,19 +128,23 @@ fun DevicesContent(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DevicesList(
     title: String,
     modifier: Modifier,
-    pairedDevices: List<BtDevice>,
+    devices: List<BtDevice>,
     onClick: (BtDevice) -> Unit
 ) {
+    if (devices.isEmpty()) return
+    Text(
+        title,
+        textAlign = TextAlign.Center,
+        fontSize = 15.sp,
+        modifier = Modifier
+            .fillMaxWidth()
+    )
     LazyColumn(modifier.fillMaxWidth()) {
-        stickyHeader {
-            Text(title, modifier.padding(start = 5.dp, bottom = 5.dp), fontSize = 15.sp)
-        }
-        items(pairedDevices) { device ->
+        items(devices) { device ->
             DeviceItem(device, onClick)
         }
     }
@@ -161,7 +164,7 @@ fun DeviceItem(device: BtDevice, onClick: (BtDevice) -> Unit) {
                 .padding(start = 15.dp, end = 15.dp, top = 5.dp, bottom = 5.dp)
                 .height(50.dp)
         ) {
-            DeviceImage()
+            DeviceImage(device)
             Column(
                 Modifier
                     .padding(start = 12.dp)
@@ -193,15 +196,21 @@ fun DeviceItem(device: BtDevice, onClick: (BtDevice) -> Unit) {
 }
 
 @Composable
-fun DeviceImage() {
+fun DeviceImage(btDevice: BtDevice) {
+    val imageResource =
+        if (btDevice.name?.contains("bike") == true)
+            R.drawable.ebike_24
+        else R.drawable.bluetooth_24
+
     Box(
         modifier = Modifier
             .size(50.dp)
             .background(Color.Gray, CircleShape),
         contentAlignment = Alignment.Center
     ) {
+
         Image(
-            painter = painterResource(id = R.drawable.ebike_24),
+            painter = painterResource(id = imageResource),
             contentDescription = "logo",
             modifier = Modifier
                 .height(30.dp)
@@ -260,17 +269,16 @@ fun DevicesTopAppBar(
         actions = {
             Text(
                 text = "start\nserver",
-                Modifier
+                modifier = Modifier
                     .clickable { onStartServer() }
                     .padding(end = 10.dp),
                 color = Color(0xFF7A7A7A),
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center,
                 lineHeight = 15.sp
-
             )
         },
-    )
+    modifier = Modifier.padding(start = 16.dp, end = 16.dp))
 }
 
 
@@ -279,8 +287,38 @@ fun DevicesTopAppBar(
 @Composable
 fun DevicesScreenPreview() {
     Bluetooth_bikeTheme {
+
+
+// Create a BtDevice
+        val exampleDevice = BtDevice(
+            name = "Test Device",
+            address = "00:11:22:33:44:55",
+            btType = BluetoothDevice.DEVICE_TYPE_CLASSIC,
+            btClass = null
+        )
+
+        val exampleEbikeDevice = BtDevice(
+            name = "Test Ebike",
+            address = "00:11:22:33:44:55",
+            btType = BluetoothDevice.DEVICE_TYPE_CLASSIC,
+            btClass = null
+        )
+
         DevicesScreen(
-            state = BluetoothUiState(),
+            state = BluetoothUiState(
+                scannedDevices = listOf(
+                    exampleDevice,
+                    exampleDevice,
+                    exampleDevice,
+                    exampleEbikeDevice
+                ),
+                pairedDevices = listOf(
+                    exampleDevice,
+                    exampleDevice,
+                    exampleDevice,
+                    exampleDevice,
+                )
+            ),
             onStartServer = {},
             onDeviceClick = {},
             onScanClick = {}

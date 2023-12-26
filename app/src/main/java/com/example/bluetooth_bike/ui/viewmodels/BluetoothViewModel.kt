@@ -6,6 +6,7 @@ import com.example.bluetooth_bike.domain.bluetooth.BluetoothController
 import com.example.bluetooth_bike.domain.bluetooth.ConnectionResult
 import com.example.bluetooth_bike.domain.model.BluetoothUiState
 import com.example.bluetooth_bike.domain.model.BtDevice
+import com.example.bluetooth_bike.domain.model.TimeModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -18,6 +19,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,7 +40,7 @@ class BluetoothViewModel @Inject constructor(
             scannedDevices = scannedDevices,
             pairedDevices = pairedDevices,
             isScanning = isScanning,
-            messages = if (state.isConnected) state.messages else emptyList()
+            values = if (state.isConnected) state.values else emptyList(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _state.value)
 
@@ -53,7 +57,49 @@ class BluetoothViewModel @Inject constructor(
             ) }
         }.launchIn(viewModelScope)
 
-        startScan()
+        //call every 60 seconds
+        viewModelScope.launch {
+            while(true) {
+                updateTime()
+                kotlinx.coroutines.delay(60000)
+            }
+        }
+    }
+
+    private fun updateTime()  {
+        val currentDateTime = getCurrentDateTime()
+        val dayOfWeek = formatDayOfWeek(currentDateTime)
+        val dayOfMonth = currentDateTime.dayOfMonth.toString()
+        val month = formatMonth(currentDateTime)
+        val hour = formatHour(currentDateTime)
+
+        _state.update { it.copy(
+            time = TimeModel(
+                day = dayOfWeek,
+                hour = hour,
+                date = "$dayOfMonth $month"
+            )
+        ) }
+        }
+
+
+    fun getCurrentDateTime(): LocalDateTime {
+        return LocalDateTime.now()
+    }
+
+    fun formatDayOfWeek(datetime: LocalDateTime): String {
+        val formatter = DateTimeFormatter.ofPattern("EEE")
+        return datetime.format(formatter).uppercase(Locale.getDefault())
+    }
+
+    fun formatHour(dateTime: LocalDateTime): String {
+        val formatter = DateTimeFormatter.ofPattern("HH:mm")
+        return dateTime.format(formatter)
+    }
+
+    fun formatMonth(dateTime: LocalDateTime): String {
+        val formatter = DateTimeFormatter.ofPattern("MMM")
+        return dateTime.format(formatter).uppercase(Locale.getDefault())
     }
 
     fun connectToDevice(device: BtDevice) {
@@ -93,12 +139,12 @@ class BluetoothViewModel @Inject constructor(
             startScan()
     }
 
-    fun sendMessage(message: String) {
+    fun sendData(message: String) { //todo
         viewModelScope.launch {
             val bluetoothMessage = bluetoothController.trySendMessage(message)
             if(bluetoothMessage != null) {
                 _state.update { it.copy(
-                    messages = it.messages + bluetoothMessage
+                    values = it.values + bluetoothMessage
                 ) }
             }
         }
@@ -124,7 +170,7 @@ class BluetoothViewModel @Inject constructor(
                 }
                 is ConnectionResult.TransferSucceeded -> {
                     _state.update { it.copy(
-                        messages = it.messages + result.message
+                        values = it.values + result.message
                     ) }
                 }
                 is ConnectionResult.Error -> {
