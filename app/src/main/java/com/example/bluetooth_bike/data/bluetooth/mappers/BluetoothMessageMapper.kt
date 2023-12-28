@@ -1,15 +1,15 @@
-package com.example.bluetooth_bike.data.bluetooth
+package com.example.bluetooth_bike.data.bluetooth.mappers
 
-import com.example.bluetooth_bike.domain.model.BluetoothMessage
+import com.example.bluetooth_bike.domain.model.BtMessage
 
-fun String.toBluetoothMessage(isFromLocalUser: Boolean): BluetoothMessage {
+fun String.toBluetoothMessage(isFromLocalUser: Boolean): BtMessage {
     val name = substringBefore("#")
     val voltage = substringAfter("#").substringBefore("$")
     val amperes = substringAfter("$").substringBefore("%")
     val speed = substringAfter("%").substringBefore("&")
     val trip = substringAfter("&").substringBefore("*")
     val total = substringAfter("*")
-    return BluetoothMessage(
+    return BtMessage(
         voltage = voltage,
         amperes = amperes,
         speed = speed,
@@ -20,8 +20,6 @@ fun String.toBluetoothMessage(isFromLocalUser: Boolean): BluetoothMessage {
     )
 }
 
-
-
-fun BluetoothMessage.toByteArray(): ByteArray {
+fun BtMessage.toByteArray(): ByteArray {
     return "$senderName#$voltage".encodeToByteArray()
 }

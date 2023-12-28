@@ -7,5 +7,4 @@ data class BtDevice(
     val address: String,
     val btType: Int,
     val btClass: BluetoothClass?
-){
-}
+)

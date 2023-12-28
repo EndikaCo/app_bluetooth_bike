@@ -1,4 +1,4 @@
-package com.example.bluetooth_bike.data.bluetooth
+package com.example.bluetooth_bike.data.bluetooth.receivers
 
 import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver

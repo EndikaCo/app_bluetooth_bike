@@ -1,7 +1,8 @@
 package com.example.bluetooth_bike.data.bluetooth
 
 import android.bluetooth.BluetoothSocket
-import com.example.bluetooth_bike.domain.model.BluetoothMessage
+import com.example.bluetooth_bike.data.bluetooth.mappers.toBluetoothMessage
+import com.example.bluetooth_bike.domain.model.BtMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -9,11 +10,10 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
-
 class BluetoothDataTransferService(
     private val socket: BluetoothSocket
 ) {
-    fun listenForIncomingMessages(): Flow<BluetoothMessage> {
+    fun listenForIncomingMessages(): Flow<BtMessage> {
         return flow {
             if(!socket.isConnected) {
                 return@flow
@@ -50,4 +50,5 @@ class BluetoothDataTransferService(
         }
     }
 }
+
 class TransferFailedException: IOException("Reading incoming data failed")

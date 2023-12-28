@@ -1,11 +1,11 @@
-package com.example.bluetooth_bike.data.bluetooth
+package com.example.bluetooth_bike.data.bluetooth.receivers
 import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 
-class FoundDeviceReceiver(
+class ScanDeviceReceiver(
     private val onDeviceFound: (BluetoothDevice) -> Unit
 ): BroadcastReceiver() {
 

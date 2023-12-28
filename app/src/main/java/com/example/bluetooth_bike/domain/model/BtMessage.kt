@@ -1,6 +1,6 @@
 package com.example.bluetooth_bike.domain.model
 
-data class BluetoothMessage(
+data class BtMessage(
     val voltage: String,
     val amperes: String,
     val speed: String,

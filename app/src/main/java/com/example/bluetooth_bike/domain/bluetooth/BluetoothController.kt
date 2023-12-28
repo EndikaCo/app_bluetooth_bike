@@ -1,6 +1,6 @@
 package com.example.bluetooth_bike.domain.bluetooth
 
-import com.example.bluetooth_bike.domain.model.BluetoothMessage
+import com.example.bluetooth_bike.domain.model.BtMessage
 import com.example.bluetooth_bike.domain.model.BtDevice
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
@@ -15,12 +15,9 @@ interface BluetoothController {
 
     fun startDiscovery()
     fun stopDiscovery()
-
     fun startBluetoothServer(): Flow<ConnectionResult>
     fun connectToDevice(device: BtDevice): Flow<ConnectionResult>
-
-    suspend fun trySendMessage(message : String) : BluetoothMessage?
-
+    suspend fun trySendMessage(message : String) : BtMessage?
     fun closeConnection()
     fun release()
 }

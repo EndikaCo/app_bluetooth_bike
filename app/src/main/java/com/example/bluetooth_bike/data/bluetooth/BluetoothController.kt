@@ -12,8 +12,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import com.example.bluetooth_bike.data.bluetooth.mappers.toBluetoothDeviceDomain
+import com.example.bluetooth_bike.data.bluetooth.mappers.toBluetoothMessage
+import com.example.bluetooth_bike.data.bluetooth.mappers.toByteArray
+import com.example.bluetooth_bike.data.bluetooth.receivers.BluetoothStateReceiver
+import com.example.bluetooth_bike.data.bluetooth.receivers.ScanDeviceReceiver
 import com.example.bluetooth_bike.domain.bluetooth.BluetoothController
-import com.example.bluetooth_bike.domain.model.BluetoothMessage
+import com.example.bluetooth_bike.domain.model.BtMessage
 import com.example.bluetooth_bike.domain.model.BtDevice
 import com.example.bluetooth_bike.domain.bluetooth.ConnectionResult
 import kotlinx.coroutines.CoroutineScope
@@ -65,7 +70,7 @@ class BluetoothController(
     override val errors: SharedFlow<String>
         get() = _errors.asSharedFlow()
 
-    private val foundDeviceReceiver = FoundDeviceReceiver { device ->
+    private val scanDeviceReceiver = ScanDeviceReceiver { device ->
         _scannedDevices.update { devices ->
             val newDevice = device.toBluetoothDeviceDomain()
             if (newDevice in devices) devices else devices + newDevice
@@ -119,7 +124,7 @@ class BluetoothController(
         }
 
         context.registerReceiver(
-            foundDeviceReceiver,
+            scanDeviceReceiver,
             IntentFilter(BluetoothDevice.ACTION_FOUND)
         )
 
@@ -198,7 +203,7 @@ class BluetoothController(
         }.flowOn(Dispatchers.IO)
     }
 
-    override suspend fun trySendMessage(message: String): BluetoothMessage? {
+    override suspend fun trySendMessage(message: String): BtMessage? {
         if (!hasPermission(Manifest.permission.BLUETOOTH_CONNECT))
             return null
 
@@ -216,9 +221,8 @@ class BluetoothController(
         currentServerSocket = null
     }
 
-
     override fun release() {
-        context.unregisterReceiver(foundDeviceReceiver)
+        context.unregisterReceiver(scanDeviceReceiver)
         context.unregisterReceiver(bluetoothStateReceiver)
         closeConnection()
     }

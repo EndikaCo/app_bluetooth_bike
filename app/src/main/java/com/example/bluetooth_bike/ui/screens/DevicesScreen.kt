@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
@@ -47,22 +48,24 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bluetooth_bike.R
 import com.example.bluetooth_bike.domain.model.BtDevice
-import com.example.bluetooth_bike.domain.model.BluetoothUiState
+import com.example.bluetooth_bike.domain.model.UiState
 import com.example.bluetooth_bike.ui.theme.Bluetooth_bikeTheme
 import kotlinx.coroutines.launch
 
 @Composable
 fun DevicesScreen(
-    state: BluetoothUiState,
+    state: UiState,
     onStartServer: () -> Unit,
     onDeviceClick: (BtDevice) -> Unit,
-    onScanClick: () -> Unit
+    onScanClick: () -> Unit,
+    onCloseClick: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -80,7 +83,7 @@ fun DevicesScreen(
         if (state.isConnected) {
             Toast.makeText(
                 context,
-                "You're connected!",
+                "Connected!",
                 Toast.LENGTH_LONG
             ).show()
         }
@@ -89,7 +92,7 @@ fun DevicesScreen(
     val snackBarHostState = remember { SnackbarHostState() }
 
     Scaffold(
-        topBar = { DevicesTopAppBar(onStartServer) },
+        topBar = { DevicesTopAppBar(onStartServer, onCloseClick) },
         floatingActionButtonPosition = FabPosition.End,
         snackbarHost = { SnackbarHost(snackBarHostState) },
         floatingActionButton = { FloatingActionButton(snackBarHostState, onScanClick, state) },
@@ -101,28 +104,23 @@ fun DevicesScreen(
 
 @Composable
 fun DevicesContent(
-    innerPadding: PaddingValues, state: BluetoothUiState,
+    innerPadding: PaddingValues, state: UiState,
     onClick: (BtDevice) -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
         Spacer(modifier = Modifier.padding(innerPadding))
         DevicesList(
-            "Paired",
-            Modifier
-                .padding(start = 16.dp, end = 16.dp)
-                .clip(RoundedCornerShape(16.dp)) // Add rounded corners
-            , state.pairedDevices, onClick
+            title = "Paired devices",
+            devices = state.pairedDevices,
+            onClick = onClick
         )
         DevicesList(
-            "Scanned",
-            Modifier
-                .padding(start = 16.dp, end = 16.dp)
-                .clip(RoundedCornerShape(16.dp)) // Add rounded corners
-            , state.scannedDevices, onClick
+            title = "Scanned devices",
+            devices = state.scannedDevices,
+            onClick = onClick
         )
         Spacer(modifier = Modifier.padding(innerPadding))
     }
@@ -131,7 +129,6 @@ fun DevicesContent(
 @Composable
 fun DevicesList(
     title: String,
-    modifier: Modifier,
     devices: List<BtDevice>,
     onClick: (BtDevice) -> Unit
 ) {
@@ -140,10 +137,16 @@ fun DevicesList(
         title,
         textAlign = TextAlign.Center,
         fontSize = 15.sp,
+        fontFamily = FontFamily.SansSerif,
         modifier = Modifier
             .fillMaxWidth()
+            .padding(bottom = 10.dp, top = 10.dp)
     )
-    LazyColumn(modifier.fillMaxWidth()) {
+    LazyColumn(
+        modifier = Modifier
+            .padding(start = 16.dp, end = 16.dp)
+            .clip(RoundedCornerShape(16.dp)),
+    ) {
         items(devices) { device ->
             DeviceItem(device, onClick)
         }
@@ -223,7 +226,7 @@ fun DeviceImage(btDevice: BtDevice) {
 fun FloatingActionButton(
     snackBarHostState: SnackbarHostState,
     onScanClick: () -> Unit,
-    state: BluetoothUiState
+    state: UiState
 ) {
     val scope = rememberCoroutineScope()
 
@@ -246,24 +249,25 @@ fun FloatingActionButton(
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DevicesTopAppBar(
-    onStartServer: () -> Unit
+    onStartServer: () -> Unit,
+    onCloseClick: () -> Unit
 ) {
     TopAppBar(
         title = {
             Text(
                 "Bluetooth devices",
-                Modifier
+                modifier = Modifier
                     .fillMaxSize()
-                    .wrapContentSize(Alignment.Center)
+                    .wrapContentSize(Alignment.Center),
+                fontFamily = FontFamily.SansSerif,
             )
         },
         navigationIcon = {
-            IconButton(onClick = { /*TODO navHostController.navigate */ }) {
-                Icon(Icons.Filled.KeyboardArrowLeft, contentDescription = "Go back")
+            IconButton(onClick = {onCloseClick() }) {
+                Icon(Icons.Filled.Close, contentDescription = "Close App")
             }
         },
         actions = {
@@ -278,18 +282,17 @@ fun DevicesTopAppBar(
                 lineHeight = 15.sp
             )
         },
-    modifier = Modifier.padding(start = 16.dp, end = 16.dp))
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp)
+    )
 }
-
 
 @Preview(name = "Light Mode")
 @Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun DevicesScreenPreview() {
+fun PreviewDevicesScreen() {
     Bluetooth_bikeTheme {
 
-
-// Create a BtDevice
+        // Create a BtDevice
         val exampleDevice = BtDevice(
             name = "Test Device",
             address = "00:11:22:33:44:55",
@@ -297,20 +300,20 @@ fun DevicesScreenPreview() {
             btClass = null
         )
 
-        val exampleEbikeDevice = BtDevice(
-            name = "Test Ebike",
+        val exampleBikeDevice = BtDevice(
+            name = "Test E bike",
             address = "00:11:22:33:44:55",
             btType = BluetoothDevice.DEVICE_TYPE_CLASSIC,
             btClass = null
         )
 
         DevicesScreen(
-            state = BluetoothUiState(
+            state = UiState(
                 scannedDevices = listOf(
                     exampleDevice,
                     exampleDevice,
                     exampleDevice,
-                    exampleEbikeDevice
+                    exampleBikeDevice
                 ),
                 pairedDevices = listOf(
                     exampleDevice,
@@ -321,7 +324,8 @@ fun DevicesScreenPreview() {
             ),
             onStartServer = {},
             onDeviceClick = {},
-            onScanClick = {}
+            onScanClick = {},
+            onCloseClick = {}
         )
     }
 }

@@ -1,9 +1,11 @@
 package com.example.bluetooth_bike.ui.navigation
 
+import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,6 +26,7 @@ fun NavGraph() {
     val navigationController = rememberNavController()
     val viewModel: BluetoothViewModel = viewModel()
     val state by viewModel.state.collectAsState()
+    val activity = LocalContext.current as Activity
 
     //listen to state
     LaunchedEffect(state) {
@@ -44,7 +47,9 @@ fun NavGraph() {
                 state = state,
                 onScanClick = viewModel::scanToggle,
                 onDeviceClick = viewModel::connectToDevice,
-                onStartServer = viewModel::waitForIncomingConnections
+                onStartServer = viewModel::waitForIncomingConnections,
+                onCloseClick = { activity.finish() }
+
             )
         }
 

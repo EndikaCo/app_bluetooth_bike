@@ -2,9 +2,11 @@ package com.example.bluetooth_bike.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.bluetooth_bike.data.DateAndTime
 import com.example.bluetooth_bike.domain.bluetooth.BluetoothController
 import com.example.bluetooth_bike.domain.bluetooth.ConnectionResult
-import com.example.bluetooth_bike.domain.model.BluetoothUiState
+import com.example.bluetooth_bike.domain.model.BtMessage
+import com.example.bluetooth_bike.domain.model.UiState
 import com.example.bluetooth_bike.domain.model.BtDevice
 import com.example.bluetooth_bike.domain.model.TimeModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,28 +21,36 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
 class BluetoothViewModel @Inject constructor(
-    private val bluetoothController: BluetoothController
-): ViewModel() {
+    private val bluetoothController: BluetoothController,
+    private val dateAndTime : DateAndTime
+) : ViewModel() {
 
-    private val _state = MutableStateFlow(BluetoothUiState())
+    private val _state = MutableStateFlow(UiState())
     val state = combine(
         bluetoothController.scannedDevices,
         bluetoothController.pairedDevices,
         bluetoothController.isScanning,
         _state
-    ) { scannedDevices, pairedDevices, isScanning,  state ->
+    ) { scannedDevices, pairedDevices, isScanning, state ->
         state.copy(
             scannedDevices = scannedDevices,
             pairedDevices = pairedDevices,
             isScanning = isScanning,
-            values = if (state.isConnected) state.values else emptyList(),
+            values = if (state.isConnected) state.values else listOf(
+                BtMessage(
+                    voltage = "0",
+                    amperes = "0",
+                    speed = "0",
+                    trip = "0",
+                    total = "0",
+                    senderName = "-",
+                    isFromLocalUser = true
+                )
+            ),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _state.value)
 
@@ -52,55 +62,40 @@ class BluetoothViewModel @Inject constructor(
         }.launchIn(viewModelScope)
 
         bluetoothController.errors.onEach { error ->
-            _state.update { it.copy(
-                errorMessage = error
-            ) }
+            _state.update {
+                it.copy(
+                    errorMessage = error
+                )
+            }
         }.launchIn(viewModelScope)
 
         //call every 60 seconds
         viewModelScope.launch {
-            while(true) {
+            while (true) {
                 updateTime()
                 kotlinx.coroutines.delay(60000)
             }
         }
     }
 
-    private fun updateTime()  {
-        val currentDateTime = getCurrentDateTime()
-        val dayOfWeek = formatDayOfWeek(currentDateTime)
+    private fun updateTime() {
+        val currentDateTime = dateAndTime.getCurrentDateTime()
+        val dayOfWeek = dateAndTime.formatDayOfWeek(currentDateTime)
         val dayOfMonth = currentDateTime.dayOfMonth.toString()
-        val month = formatMonth(currentDateTime)
-        val hour = formatHour(currentDateTime)
+        val month = dateAndTime.formatMonth(currentDateTime)
+        val hour = dateAndTime.formatHour(currentDateTime)
 
-        _state.update { it.copy(
-            time = TimeModel(
-                day = dayOfWeek,
-                hour = hour,
-                date = "$dayOfMonth $month"
+        _state.update {
+            it.copy(
+                time = TimeModel(
+                    day = dayOfWeek,
+                    hour = hour,
+                    date = "$dayOfMonth $month"
+                )
             )
-        ) }
         }
-
-
-    fun getCurrentDateTime(): LocalDateTime {
-        return LocalDateTime.now()
     }
 
-    fun formatDayOfWeek(datetime: LocalDateTime): String {
-        val formatter = DateTimeFormatter.ofPattern("EEE")
-        return datetime.format(formatter).uppercase(Locale.getDefault())
-    }
-
-    fun formatHour(dateTime: LocalDateTime): String {
-        val formatter = DateTimeFormatter.ofPattern("HH:mm")
-        return dateTime.format(formatter)
-    }
-
-    fun formatMonth(dateTime: LocalDateTime): String {
-        val formatter = DateTimeFormatter.ofPattern("MMM")
-        return dateTime.format(formatter).uppercase(Locale.getDefault())
-    }
 
     fun connectToDevice(device: BtDevice) {
         _state.update { it.copy(isConnecting = true) }
@@ -112,10 +107,12 @@ class BluetoothViewModel @Inject constructor(
     fun disconnectFromDevice() {
         deviceConnectionJob?.cancel()
         bluetoothController.closeConnection()
-        _state.update { it.copy(
-            isConnecting = false,
-            isConnected = false
-        ) }
+        _state.update {
+            it.copy(
+                isConnecting = false,
+                isConnected = false
+            )
+        }
     }
 
     fun waitForIncomingConnections() {
@@ -125,14 +122,16 @@ class BluetoothViewModel @Inject constructor(
             .listen()
     }
 
-    fun cancelServer(){
+    fun cancelServer() {
         deviceConnectionJob?.cancel()
-        _state.update { it.copy(
-            isConnecting = false,
-        ) }
+        _state.update {
+            it.copy(
+                isConnecting = false,
+            )
+        }
     }
 
-    fun scanToggle(){
+    fun scanToggle() {
         if (bluetoothController.isScanning.value)
             stopScan()
         else
@@ -142,10 +141,12 @@ class BluetoothViewModel @Inject constructor(
     fun sendData(message: String) { //todo
         viewModelScope.launch {
             val bluetoothMessage = bluetoothController.trySendMessage(message)
-            if(bluetoothMessage != null) {
-                _state.update { it.copy(
-                    values = it.values + bluetoothMessage
-                ) }
+            if (bluetoothMessage != null) {
+                _state.update {
+                    it.copy(
+                        values = it.values + bluetoothMessage
+                    )
+                }
             }
         }
     }
@@ -160,34 +161,44 @@ class BluetoothViewModel @Inject constructor(
 
     private fun Flow<ConnectionResult>.listen(): Job {
         return onEach { result ->
-            when(result) {
+            when (result) {
                 ConnectionResult.ConnectionEstablished -> {
-                    _state.update { it.copy(
-                        isConnected = true,
-                        isConnecting = false,
-                        errorMessage = null
-                    ) }
+                    _state.update {
+                        it.copy(
+                            isConnected = true,
+                            isConnecting = false,
+                            errorMessage = null
+                        )
+                    }
                 }
+
                 is ConnectionResult.TransferSucceeded -> {
-                    _state.update { it.copy(
-                        values = it.values + result.message
-                    ) }
+                    _state.update {
+                        it.copy(
+                            values = it.values + result.message
+                        )
+                    }
                 }
+
                 is ConnectionResult.Error -> {
-                    _state.update { it.copy(
-                        isConnected = false,
-                        isConnecting = false,
-                        errorMessage = result.message
-                    ) }
+                    _state.update {
+                        it.copy(
+                            isConnected = false,
+                            isConnecting = false,
+                            errorMessage = result.message
+                        )
+                    }
                 }
             }
         }
             .catch {
                 bluetoothController.closeConnection()
-                _state.update { it.copy(
-                    isConnected = false,
-                    isConnecting = false,
-                ) }
+                _state.update {
+                    it.copy(
+                        isConnected = false,
+                        isConnecting = false,
+                    )
+                }
             }
             .launchIn(viewModelScope)
     }
