@@ -2,11 +2,13 @@
 package com.example.bluetooth_bike.ui.screens
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Highlight
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -14,8 +16,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,6 +41,19 @@ fun BikeScreen(
     onStartClick: () -> Unit,
     onLightClick: () -> Unit
 ) {
+
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = uiState.isConnected) {
+        if (uiState.isConnected) {
+            Toast.makeText(
+                context,
+                "Connected!",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
     Scaffold(
         topBar = { MyTopBar(uiState, onDisconnect, onSettingsClick = {/*todo*/ }) },
         bottomBar = { MyBottomBar(onStartClick, onLightClick) }
@@ -47,6 +64,18 @@ fun BikeScreen(
 
 @Composable
 fun BikeScreenContent(innerPadding: PaddingValues, uiState: UiState) {
+
+    if (uiState.values.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+        return
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -58,7 +87,7 @@ fun BikeScreenContent(innerPadding: PaddingValues, uiState: UiState) {
     {
         DateInfoView(uiState.time)
         Divider(Modifier.padding(top = 10.dp, bottom = 20.dp))
-        BatteryInfoView(uiState.values)
+        BatteryInfoView(uiState.values.last())
         SpeedInfoView()
         TripKmView(uiState.values.last().trip, uiState.values.last().total)
         Divider(Modifier.padding(top = 10.dp, bottom = 20.dp))

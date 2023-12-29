@@ -29,15 +29,12 @@ fun calculateBatteryPercentage(currentVoltage: Float, minVoltage: Float, maxVolt
 }
 
 @Composable
-fun BatteryInfoView(values: List<BtMessage>) {
+fun BatteryInfoView(values: BtMessage) {
 
-    if (values.isEmpty()) return
-
-    val voltage = values.last().voltage
+    val voltage = values.voltage
     val batteryPercentage: Float = calculateBatteryPercentage(voltage.toFloat(), 40f, 67.2f)
-
-    val amperes = values.last().amperes.toFloat()
-    val watts = values.last().amperes.toFloat() * values.last().voltage.toFloat()
+    val amperes = values.amperes.toFloat()
+    val watts = values.amperes.toFloat() * values.voltage.toFloat()
 
     val batteryColor = when {
         batteryPercentage >= 0.6f -> Color.Green
@@ -75,7 +72,7 @@ fun BatteryInfoView(values: List<BtMessage>) {
 @Preview
 @Composable
 fun PreviewBatteryInfoView() {
-    val mockData = listOf(
+    val mockData =
         BtMessage(
             voltage = "50",
             amperes = "1",
@@ -84,8 +81,7 @@ fun PreviewBatteryInfoView() {
             total = "10",
             senderName = "test",
             isFromLocalUser = true
-        ),
-    )
+        )
     BatteryInfoView(mockData)
 }
 
@@ -93,7 +89,7 @@ fun PreviewBatteryInfoView() {
 @Preview
 @Composable
 fun PreviewBatteryInfoView2() {
-    val mockData = listOf(
+    val mockData =
         BtMessage(
             voltage = "65",
             amperes = "1.56",
@@ -102,7 +98,6 @@ fun PreviewBatteryInfoView2() {
             total = "101.50",
             senderName = "test",
             isFromLocalUser = true
-        ),
     )
     BatteryInfoView(mockData)
 }
@@ -112,7 +107,7 @@ fun PreviewBatteryInfoView2() {
 fun PreviewBatteryInfoView3() {
     Bluetooth_bikeTheme {
 
-    val mockData = listOf(
+    val mockData =
         BtMessage(
             voltage = "48",
             amperes = "1.56",
@@ -121,7 +116,6 @@ fun PreviewBatteryInfoView3() {
             total = "101.50",
             senderName = "test",
             isFromLocalUser = true
-        ),
     )
     BatteryInfoView(mockData)}
 }

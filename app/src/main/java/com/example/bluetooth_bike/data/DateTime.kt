@@ -3,8 +3,9 @@ package com.example.bluetooth_bike.data
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import javax.inject.Inject
 
-class DateAndTime{
+class DateAndTime @Inject constructor(){
 
     fun getCurrentDateTime() : LocalDateTime {
         return LocalDateTime.now()

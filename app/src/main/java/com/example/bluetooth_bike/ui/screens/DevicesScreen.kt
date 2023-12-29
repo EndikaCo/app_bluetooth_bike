@@ -79,20 +79,10 @@ fun DevicesScreen(
         }
     }
 
-    LaunchedEffect(key1 = state.isConnected) {
-        if (state.isConnected) {
-            Toast.makeText(
-                context,
-                "Connected!",
-                Toast.LENGTH_LONG
-            ).show()
-        }
-    }
-
     val snackBarHostState = remember { SnackbarHostState() }
 
     Scaffold(
-        topBar = { DevicesTopAppBar(onStartServer, onCloseClick) },
+        topBar = { DevicesTopAppBar(onStartServer) },
         floatingActionButtonPosition = FabPosition.End,
         snackbarHost = { SnackbarHost(snackBarHostState) },
         floatingActionButton = { FloatingActionButton(snackBarHostState, onScanClick, state) },
@@ -108,43 +98,26 @@ fun DevicesContent(
     onClick: (BtDevice) -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Spacer(modifier = Modifier.padding(innerPadding))
         DevicesList(
-            title = "Paired devices",
             devices = state.pairedDevices,
             onClick = onClick
         )
-        DevicesList(
-            title = "Scanned devices",
-            devices = state.scannedDevices,
-            onClick = onClick
-        )
-        Spacer(modifier = Modifier.padding(innerPadding))
     }
 }
 
 @Composable
 fun DevicesList(
-    title: String,
     devices: List<BtDevice>,
     onClick: (BtDevice) -> Unit
 ) {
-    if (devices.isEmpty()) return
-    Text(
-        title,
-        textAlign = TextAlign.Center,
-        fontSize = 15.sp,
-        fontFamily = FontFamily.SansSerif,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 10.dp, top = 10.dp)
-    )
     LazyColumn(
         modifier = Modifier
-            .padding(start = 16.dp, end = 16.dp)
+            .padding(start = 16.dp, end = 20.dp)
             .clip(RoundedCornerShape(16.dp)),
     ) {
         items(devices) { device ->
@@ -175,24 +148,28 @@ fun DeviceItem(device: BtDevice, onClick: (BtDevice) -> Unit) {
             ) {
                 Text(
                     text = device.name ?: "Unknown",
-                    modifier = Modifier
-                        .height(25.dp)
+                    modifier = Modifier.height(25.dp)
                 )
                 Text(
                     text = device.address,
-                    modifier = Modifier
-                        .height(25.dp)
+                    modifier = Modifier.height(25.dp)
                 )
             }
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .align(Alignment.CenterVertically),
-                contentAlignment = Alignment.CenterEnd, // Center content in the Box
-
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.align(Alignment.CenterVertically),
             ) {
-                if (device.btType == BluetoothDevice.DEVICE_TYPE_LE)
-                    Text(text = "BLE", color = Color(0xFF249696), fontSize = 12.sp)
+                if (device.isPaired)
+                    Icon(
+                        painter = painterResource(id = R.drawable.sync_24),
+                        contentDescription = "device bonded",
+                        Modifier.size(18.dp)
+                    )
+
+                if (device.btType == BluetoothDevice.DEVICE_TYPE_LE) {
+                    Spacer(modifier = Modifier.width(25.dp))
+                    Text(text = "BLE", color = Color(0xFF249696), fontSize = 14.sp)
+                }
             }
         }
     }
@@ -252,37 +229,24 @@ fun FloatingActionButton(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DevicesTopAppBar(
-    onStartServer: () -> Unit,
     onCloseClick: () -> Unit
 ) {
     TopAppBar(
         title = {
             Text(
-                "Bluetooth devices",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .wrapContentSize(Alignment.Center),
+                text = "Bluetooth devices",
+                modifier = Modifier.fillMaxWidth().padding(end = 50.dp),
+                fontSize = 16.sp,
                 fontFamily = FontFamily.SansSerif,
+                textAlign = TextAlign.Center
             )
         },
         navigationIcon = {
-            IconButton(onClick = {onCloseClick() }) {
+            IconButton(onClick = { onCloseClick() }) {
                 Icon(Icons.Filled.Close, contentDescription = "Close App")
             }
         },
-        actions = {
-            Text(
-                text = "start\nserver",
-                modifier = Modifier
-                    .clickable { onStartServer() }
-                    .padding(end = 10.dp),
-                color = Color(0xFF7A7A7A),
-                fontSize = 16.sp,
-                textAlign = TextAlign.Center,
-                lineHeight = 15.sp
-            )
-        },
-        modifier = Modifier.padding(start = 16.dp, end = 16.dp)
+        actions = { Text(text = "") }
     )
 }
 
@@ -297,26 +261,23 @@ fun PreviewDevicesScreen() {
             name = "Test Device",
             address = "00:11:22:33:44:55",
             btType = BluetoothDevice.DEVICE_TYPE_CLASSIC,
-            btClass = null
+            btClass = null,
+            isPaired = false
         )
 
         val exampleBikeDevice = BtDevice(
             name = "Test E bike",
             address = "00:11:22:33:44:55",
-            btType = BluetoothDevice.DEVICE_TYPE_CLASSIC,
-            btClass = null
+            btType = BluetoothDevice.DEVICE_TYPE_LE,
+            btClass = null,
+            isPaired = true
         )
 
         DevicesScreen(
             state = UiState(
-                scannedDevices = listOf(
-                    exampleDevice,
-                    exampleDevice,
-                    exampleDevice,
-                    exampleBikeDevice
-                ),
                 pairedDevices = listOf(
-                    exampleDevice,
+                    exampleBikeDevice,
+                    exampleBikeDevice,
                     exampleDevice,
                     exampleDevice,
                     exampleDevice,

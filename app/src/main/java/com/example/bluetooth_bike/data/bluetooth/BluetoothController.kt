@@ -50,12 +50,8 @@ class BluetoothController(
         bluetoothManager?.adapter
     }
 
-    private val _scannedDevices = MutableStateFlow<List<BtDevice>>(emptyList())
-    override val scannedDevices: StateFlow<List<BtDevice>>
-        get() = _scannedDevices.asStateFlow()
-
     private val _pairedDevices = MutableStateFlow<List<BtDevice>>(emptyList())
-    override val pairedDevices: StateFlow<List<BtDevice>>
+    override val devices: StateFlow<List<BtDevice>>
         get() = _pairedDevices.asStateFlow()
 
     private val _isScanning = MutableStateFlow(false)
@@ -71,10 +67,22 @@ class BluetoothController(
         get() = _errors.asSharedFlow()
 
     private val scanDeviceReceiver = ScanDeviceReceiver { device ->
-        _scannedDevices.update { devices ->
-            val newDevice = device.toBluetoothDeviceDomain()
+        _pairedDevices.update { devices ->
+            val newDevice = device.toBluetoothDeviceDomain(isPaired = false)
             if (newDevice in devices) devices else devices + newDevice
         }
+    }
+
+    private fun updatePairedDevices() {
+        if (!hasPermission(Manifest.permission.BLUETOOTH_CONNECT))
+            return
+
+        bluetoothAdapter
+            ?.bondedDevices
+            ?.map { it.toBluetoothDeviceDomain(isPaired = true) }
+            ?.also { devices ->
+                _pairedDevices.update { devices }
+            }
     }
 
     private val discoveryReceiver = object : BroadcastReceiver() {
@@ -227,17 +235,7 @@ class BluetoothController(
         closeConnection()
     }
 
-    private fun updatePairedDevices() {
-        if (!hasPermission(Manifest.permission.BLUETOOTH_CONNECT))
-            return
 
-        bluetoothAdapter
-            ?.bondedDevices
-            ?.map { it.toBluetoothDeviceDomain() }
-            ?.also { devices ->
-                _pairedDevices.update { devices }
-            }
-    }
 
     private fun hasPermission(permission: String): Boolean {
         return context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED

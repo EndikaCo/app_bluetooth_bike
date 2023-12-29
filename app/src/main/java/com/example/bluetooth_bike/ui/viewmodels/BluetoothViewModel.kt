@@ -31,16 +31,14 @@ class BluetoothViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(UiState())
     val state = combine(
-        bluetoothController.scannedDevices,
-        bluetoothController.pairedDevices,
+        bluetoothController.devices,
         bluetoothController.isScanning,
         _state
-    ) { scannedDevices, pairedDevices, isScanning, state ->
-        state.copy(
-            scannedDevices = scannedDevices,
-            pairedDevices = pairedDevices,
+    ) {  devices, isScanning, uiState ->
+        uiState.copy(
+            pairedDevices = devices,
             isScanning = isScanning,
-            values = if (state.isConnected) state.values else listOf(
+            values = if (uiState.isConnected) uiState.values else listOf(
                 BtMessage(
                     voltage = "0",
                     amperes = "0",
