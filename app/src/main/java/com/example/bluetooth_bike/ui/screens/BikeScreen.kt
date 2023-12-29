@@ -1,4 +1,3 @@
-
 package com.example.bluetooth_bike.ui.screens
 
 import android.content.res.Configuration
@@ -41,21 +40,13 @@ fun BikeScreen(
     onStartClick: () -> Unit,
     onLightClick: () -> Unit
 ) {
-
-    val context = LocalContext.current
-
-    LaunchedEffect(key1 = uiState.isConnected) {
-        if (uiState.isConnected) {
-            Toast.makeText(
-                context,
-                "Connected!",
-                Toast.LENGTH_LONG
-            ).show()
-        }
-    }
+    val name =
+        if (uiState.values.isNotEmpty())
+            uiState.values.last().senderName
+        else "Unknown"
 
     Scaffold(
-        topBar = { MyTopBar(uiState, onDisconnect, onSettingsClick = {/*todo*/ }) },
+        topBar = { MyTopBar(name, onDisconnect) {/*todo*/ } },
         bottomBar = { MyBottomBar(onStartClick, onLightClick) }
     ) { innerPadding ->
         BikeScreenContent(innerPadding, uiState)
@@ -97,7 +88,7 @@ fun BikeScreenContent(innerPadding: PaddingValues, uiState: UiState) {
 }
 
 @Composable
-fun TripKmView(trip : String, total : String) {
+fun TripKmView(trip: String, total: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Spacer(modifier = Modifier.width(20.dp))
         Text(text = "trip(km) ", fontSize = 10.sp)
@@ -117,7 +108,7 @@ fun TripKmView(trip : String, total : String) {
 }
 
 @Composable
-fun SpeedInfoView(speed : String = "00") {
+fun SpeedInfoView(speed: String = "00") {
     Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.Center) {
         Text(text = speed, fontSize = 120.sp, modifier = Modifier.padding(start = 50.dp))
         Text(
@@ -130,7 +121,7 @@ fun SpeedInfoView(speed : String = "00") {
 }
 
 @Composable
-fun MyTopBar(uiState: UiState, onDisconnect: () -> Unit, onSettingsClick: () -> Unit) {
+fun MyTopBar(name: String, onDisconnect: () -> Unit, onSettingsClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -149,7 +140,7 @@ fun MyTopBar(uiState: UiState, onDisconnect: () -> Unit, onSettingsClick: () -> 
         }
         Box {
             Text(
-                text = if(uiState.values.isNotEmpty())"Connected to $uiState.values[0].senderName" else "Connecting...",
+                text = "Connected to $name",
                 textAlign = TextAlign.Center,
             )
         }
@@ -175,7 +166,6 @@ fun MyBottomBar(onStartClick: () -> Unit, onLightClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             IconButton(
                 onClick = { onStartClick() },
                 modifier = Modifier.size(60.dp)
@@ -185,11 +175,9 @@ fun MyBottomBar(onStartClick: () -> Unit, onLightClick: () -> Unit) {
                     contentDescription = "Start",
                     modifier = Modifier.size(40.dp)
                 )
-            }
-            Text(text = "Start", fontSize = 8.sp, style = MaterialTheme.typography.titleSmall)
         }
         IconButton(
-            onClick = { onLightClick()},
+            onClick = { onLightClick() },
             modifier = Modifier.size(24.dp)
         ) {
             Column {
@@ -209,9 +197,11 @@ fun MyBottomBar(onStartClick: () -> Unit, onLightClick: () -> Unit) {
 fun PreviewBikeScreen() {
     Bluetooth_bikeTheme {
         BikeScreen(
-            UiState(time = TimeModel("Mon", "12:00", "12 Jan"), values = listOf(
-                BtMessage("60", "0", "00", "100", "1233", "Ebike01", false),
-            )),
+            UiState(
+                time = TimeModel("Mon", "12:00", "12 Jan"), values = listOf(
+                    BtMessage("60", "0", "00", "100", "1233", "Ebike01", false),
+                )
+            ),
             {},
             {},
             {}

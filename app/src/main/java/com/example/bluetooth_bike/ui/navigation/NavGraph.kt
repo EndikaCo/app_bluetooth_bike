@@ -49,7 +49,6 @@ fun NavGraph() {
                 onDeviceClick = viewModel::connectToDevice,
                 onStartServer = viewModel::waitForIncomingConnections,
                 onCloseClick = { activity.finish() }
-
             )
         }
 

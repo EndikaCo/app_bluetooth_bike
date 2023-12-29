@@ -12,6 +12,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.util.Log
 import com.example.bluetooth_bike.data.bluetooth.mappers.toBluetoothDeviceDomain
 import com.example.bluetooth_bike.data.bluetooth.mappers.toBluetoothMessage
 import com.example.bluetooth_bike.data.bluetooth.mappers.toByteArray
@@ -21,6 +22,7 @@ import com.example.bluetooth_bike.domain.bluetooth.BluetoothController
 import com.example.bluetooth_bike.domain.model.BtMessage
 import com.example.bluetooth_bike.domain.model.BtDevice
 import com.example.bluetooth_bike.domain.bluetooth.ConnectionResult
+import com.example.bluetooth_bike.domain.utils.App
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -50,9 +52,9 @@ class BluetoothController(
         bluetoothManager?.adapter
     }
 
-    private val _pairedDevices = MutableStateFlow<List<BtDevice>>(emptyList())
+    private val _devices = MutableStateFlow<List<BtDevice>>(emptyList())
     override val devices: StateFlow<List<BtDevice>>
-        get() = _pairedDevices.asStateFlow()
+        get() = _devices.asStateFlow()
 
     private val _isScanning = MutableStateFlow(false)
     override val isScanning: StateFlow<Boolean>
@@ -67,7 +69,7 @@ class BluetoothController(
         get() = _errors.asSharedFlow()
 
     private val scanDeviceReceiver = ScanDeviceReceiver { device ->
-        _pairedDevices.update { devices ->
+        _devices.update { devices ->
             val newDevice = device.toBluetoothDeviceDomain(isPaired = false)
             if (newDevice in devices) devices else devices + newDevice
         }
@@ -81,7 +83,7 @@ class BluetoothController(
             ?.bondedDevices
             ?.map { it.toBluetoothDeviceDomain(isPaired = true) }
             ?.also { devices ->
-                _pairedDevices.update { devices }
+                _devices.update { devices }
             }
     }
 
@@ -200,14 +202,18 @@ class BluetoothController(
                 try {
                     socket.connect()
                     emit(ConnectionResult.ConnectionEstablished)
+                    Log.i(App.tag, "Connected to ${device.name}")
+
                 } catch (e: IOException) {
                     socket.close()
                     currentClientSocket = null
                     emit(ConnectionResult.Error("Connection was interrupted"))
+                    Log.e(App.tag, "Connection was interrupted: ${e.message}")
                 }
             }
         }.onCompletion {
-            closeConnection()
+            Log.i(App.tag, "Connection closed onCompletion")
+            //closeConnection() //todo
         }.flowOn(Dispatchers.IO)
     }
 
@@ -227,6 +233,7 @@ class BluetoothController(
         currentServerSocket?.close()
         currentClientSocket = null
         currentServerSocket = null
+        Log.i(App.tag, "Connection closed")
     }
 
     override fun release() {

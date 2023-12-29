@@ -25,7 +25,9 @@ import com.example.bluetooth_bike.domain.model.BtMessage
 import com.example.bluetooth_bike.ui.theme.Bluetooth_bikeTheme
 
 fun calculateBatteryPercentage(currentVoltage: Float, minVoltage: Float, maxVoltage: Float): Float {
-    return (currentVoltage - minVoltage) / (maxVoltage - minVoltage)
+    val percentage = (currentVoltage - minVoltage) / (maxVoltage - minVoltage)
+    if (percentage < 0) return 0f
+    return percentage
 }
 
 @Composable

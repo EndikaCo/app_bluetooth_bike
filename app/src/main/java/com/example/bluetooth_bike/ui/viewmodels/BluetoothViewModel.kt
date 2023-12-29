@@ -1,5 +1,6 @@
 package com.example.bluetooth_bike.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bluetooth_bike.data.DateAndTime
@@ -38,17 +39,7 @@ class BluetoothViewModel @Inject constructor(
         uiState.copy(
             pairedDevices = devices,
             isScanning = isScanning,
-            values = if (uiState.isConnected) uiState.values else listOf(
-                BtMessage(
-                    voltage = "0",
-                    amperes = "0",
-                    speed = "0",
-                    trip = "0",
-                    total = "0",
-                    senderName = "-",
-                    isFromLocalUser = true
-                )
-            ),
+            values = if (uiState.isConnected) uiState.values else emptyList()
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _state.value)
 
@@ -94,7 +85,6 @@ class BluetoothViewModel @Inject constructor(
         }
     }
 
-
     fun connectToDevice(device: BtDevice) {
         _state.update { it.copy(isConnecting = true) }
         deviceConnectionJob = bluetoothController
@@ -136,16 +126,9 @@ class BluetoothViewModel @Inject constructor(
             startScan()
     }
 
-    fun sendData(message: String) { //todo
+    fun sendData(message: String) {
         viewModelScope.launch {
-            val bluetoothMessage = bluetoothController.trySendMessage(message)
-            if (bluetoothMessage != null) {
-                _state.update {
-                    it.copy(
-                        values = it.values + bluetoothMessage
-                    )
-                }
-            }
+            bluetoothController.trySendMessage(message)
         }
     }
 
@@ -159,6 +142,7 @@ class BluetoothViewModel @Inject constructor(
 
     private fun Flow<ConnectionResult>.listen(): Job {
         return onEach { result ->
+
             when (result) {
                 ConnectionResult.ConnectionEstablished -> {
                     _state.update {

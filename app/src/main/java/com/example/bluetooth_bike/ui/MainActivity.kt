@@ -20,10 +20,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    companion object {
-        const val TAG = "*** MainActivity"
-    }
-
     private val viewModel: MainActivityViewModel by viewModels()
 
     private val bluetoothManager by lazy { applicationContext.getSystemService(BluetoothManager::class.java) }
@@ -52,7 +48,7 @@ class MainActivity : ComponentActivity() {
         val enableBluetoothLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
-            Log.v(TAG, "$result")
+            Log.v(this::class.java.simpleName, "$result")
         }
 
         val permissionLauncher = registerForActivityResult(
