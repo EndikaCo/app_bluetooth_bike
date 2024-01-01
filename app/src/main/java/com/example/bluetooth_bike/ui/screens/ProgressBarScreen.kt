@@ -1,4 +1,4 @@
-package com.example.bluetooth_bike.ui.screens
+ package com.example.bluetooth_bike.ui.screens
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement

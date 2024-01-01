@@ -82,7 +82,7 @@ fun DevicesScreen(
     val snackBarHostState = remember { SnackbarHostState() }
 
     Scaffold(
-        topBar = { DevicesTopAppBar(onStartServer) },
+        topBar = { DevicesTopAppBar(onCloseClick) },
         floatingActionButtonPosition = FabPosition.End,
         snackbarHost = { SnackbarHost(snackBarHostState) },
         floatingActionButton = { FloatingActionButton(snackBarHostState, onScanClick, state) },

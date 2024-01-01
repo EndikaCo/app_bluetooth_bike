@@ -32,8 +32,10 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -158,7 +160,7 @@ class BluetoothController(
 
     override fun startBluetoothServer(): Flow<ConnectionResult> {
         return flow {
-            if (!hasPermission(Manifest.permission.BLUETOOTH_CONNECT)) {
+            if(!hasPermission(Manifest.permission.BLUETOOTH_CONNECT)) {
                 throw SecurityException("No BLUETOOTH_CONNECT permission")
             }
 
@@ -168,16 +170,26 @@ class BluetoothController(
             )
 
             var shouldLoop = true
-            while (shouldLoop) {
+            while(shouldLoop) {
                 currentClientSocket = try {
                     currentServerSocket?.accept()
-                } catch (e: IOException) {
+                } catch(e: IOException) {
                     shouldLoop = false
                     null
                 }
                 emit(ConnectionResult.ConnectionEstablished)
                 currentClientSocket?.let {
                     currentServerSocket?.close()
+                    val service = BluetoothDataTransferService(it)
+                    dataTransferService = service
+
+                    emitAll(
+                        service
+                            .listenForIncomingMessages()
+                            .map {
+                                ConnectionResult.TransferSucceeded(it)
+                            }
+                    )
                 }
             }
         }.onCompletion {
@@ -202,8 +214,14 @@ class BluetoothController(
                 try {
                     socket.connect()
                     emit(ConnectionResult.ConnectionEstablished)
-                    Log.i(App.tag, "Connected to ${device.name}")
 
+                    BluetoothDataTransferService(socket).also {
+                        dataTransferService = it
+                        emitAll(
+                            it.listenForIncomingMessages()
+                                .map { ConnectionResult.TransferSucceeded(it) }
+                        )
+                    }
                 } catch (e: IOException) {
                     socket.close()
                     currentClientSocket = null
@@ -212,14 +230,17 @@ class BluetoothController(
                 }
             }
         }.onCompletion {
-            Log.i(App.tag, "Connection closed onCompletion")
-            //closeConnection() //todo
+            closeConnection()
         }.flowOn(Dispatchers.IO)
     }
 
     override suspend fun trySendMessage(message: String): BtMessage? {
         if (!hasPermission(Manifest.permission.BLUETOOTH_CONNECT))
             return null
+
+        if(dataTransferService == null) {
+            return null
+        }
 
         val bluetoothMessage = message.toBluetoothMessage(isFromLocalUser = true)
 
@@ -241,8 +262,6 @@ class BluetoothController(
         context.unregisterReceiver(bluetoothStateReceiver)
         closeConnection()
     }
-
-
 
     private fun hasPermission(permission: String): Boolean {
         return context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED

@@ -21,26 +21,29 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.bluetooth_bike.domain.model.BtMessage
 import com.example.bluetooth_bike.domain.model.Point
+import com.example.bluetooth_bike.domain.model.TimeModel
+import com.example.bluetooth_bike.domain.model.UiState
 import com.example.bluetooth_bike.ui.theme.Bluetooth_bikeTheme
 
-@Composable
-fun BatteryValuesChart() {
 
-    val values = listOf(
-        Point(1f, 60f),
-        Point(1.5f, 61f),
-        Point(2f, 63f),
-        Point(2.5f, 40f),
-        Point(3f, 35f),
-        Point(3.5f, 55f),
-        Point(4f, 50f),
-    )
+fun parseBtMessagesToPoints(btMessages: List<BtMessage>): List<Point> {
+    return btMessages.mapIndexed { index, btMessage ->
+        Point(index.toFloat(), btMessage.voltage.toFloat())
+    }
+}
+
+@Composable
+fun BatteryValuesChart(values: List<BtMessage>) {
+
+    val parsedValues = parseBtMessagesToPoints(values)
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.background (MaterialTheme.colorScheme.background)
     ) {
-        LineChart(Modifier.size(250.dp, 200.dp), values)
+        LineChart(Modifier.size(250.dp, 200.dp), parsedValues)
         Spacer(modifier = Modifier.height(10.dp))
         ShowLegend()
     }
@@ -145,7 +148,19 @@ fun Float.mapValueToDifferentRange(
 @Preview
 @Composable
 fun PreviewBatteryValuesChart() {
+
+    val uiState = UiState(
+        time = TimeModel("Mon", "12:00", "12 Jan"), values = listOf(
+            BtMessage("65", "30", "30", "100", "1233", "Ebike01", false),
+            BtMessage("66", "2", "25", "100", "1233", "Ebike01", false),
+            BtMessage("50", "50", "00", "100", "1233", "Ebike01", false),
+            BtMessage("67", "0", "10", "100", "1233", "Ebike01", false),
+            BtMessage("66", "0", "00", "100", "1233", "Ebike01", false),
+            BtMessage("65", "0", "00", "100", "1233", "Ebike01", false),
+        )
+    )
+
     Bluetooth_bikeTheme {
-        BatteryValuesChart()
+        BatteryValuesChart(uiState.values)
     }
 }

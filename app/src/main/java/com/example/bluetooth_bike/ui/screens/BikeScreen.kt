@@ -1,13 +1,11 @@
 package com.example.bluetooth_bike.ui.screens
 
 import android.content.res.Configuration
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Highlight
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -15,10 +13,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,17 +52,6 @@ fun BikeScreen(
 @Composable
 fun BikeScreenContent(innerPadding: PaddingValues, uiState: UiState) {
 
-    if (uiState.values.isEmpty()) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
-        return
-    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -82,7 +67,7 @@ fun BikeScreenContent(innerPadding: PaddingValues, uiState: UiState) {
         SpeedInfoView()
         TripKmView(uiState.values.last().trip, uiState.values.last().total)
         Divider(Modifier.padding(top = 10.dp, bottom = 20.dp))
-        BatteryValuesChart()
+        BatteryValuesChart(uiState.values)
         Spacer(modifier = Modifier.padding(bottom = 20.dp))
     }
 }
@@ -198,8 +183,14 @@ fun PreviewBikeScreen() {
     Bluetooth_bikeTheme {
         BikeScreen(
             UiState(
-                time = TimeModel("Mon", "12:00", "12 Jan"), values = listOf(
-                    BtMessage("60", "0", "00", "100", "1233", "Ebike01", false),
+                time = TimeModel("Mon", "12:00", "12 Jan"),
+                values = listOf(
+                    BtMessage("65", "30", "30", "100", "1233", "Ebike01", false),
+                    BtMessage("66", "2", "25", "100", "1233", "Ebike01", false),
+                    BtMessage("67", "0", "10", "100", "1233", "Ebike01", false),
+                    BtMessage("50", "50", "00", "100", "1233", "Ebike01", false),
+                    BtMessage("66", "0", "00", "100", "1233", "Ebike01", false),
+                    BtMessage("65", "0", "00", "100", "1233", "Ebike01", false),
                 )
             ),
             {},
