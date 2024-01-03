@@ -1,6 +1,5 @@
 package com.example.bluetooth_bike.domain.utils
 
-
 object App {
     val tag: String
         get() {

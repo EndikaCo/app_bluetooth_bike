@@ -1,12 +1,10 @@
 package com.example.bluetooth_bike.ui.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bluetooth_bike.data.DateAndTime
 import com.example.bluetooth_bike.domain.bluetooth.BluetoothController
 import com.example.bluetooth_bike.domain.bluetooth.ConnectionResult
-import com.example.bluetooth_bike.domain.model.BtMessage
 import com.example.bluetooth_bike.domain.model.UiState
 import com.example.bluetooth_bike.domain.model.BtDevice
 import com.example.bluetooth_bike.domain.model.TimeModel
@@ -101,13 +99,6 @@ class BluetoothViewModel @Inject constructor(
                 isConnected = false
             )
         }
-    }
-
-    fun waitForIncomingConnections() {
-        _state.update { it.copy(isConnecting = true) }
-        deviceConnectionJob = bluetoothController
-            .startBluetoothServer()
-            .listen()
     }
 
     fun cancelServer() {

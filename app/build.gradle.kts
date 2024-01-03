@@ -74,6 +74,9 @@ dependencies {
     //dagger hilt
     implementation("com.google.dagger:hilt-android:2.48")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.test:core-ktx:1.5.0")
+    implementation("androidx.test.ext:junit-ktx:1.1.5")
+    testImplementation("junit:junit:4.13.2")
     kapt("com.google.dagger:hilt-compiler:2.48")
 
     //viewModel()
@@ -95,5 +98,4 @@ dependencies {
 
     //constraint layout
     implementation ("androidx.constraintlayout:constraintlayout-compose:1.0.1")
-
 }

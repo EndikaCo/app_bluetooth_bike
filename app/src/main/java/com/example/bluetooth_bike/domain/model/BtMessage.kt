@@ -7,5 +7,4 @@ data class BtMessage(
     val trip : String,
     val total : String,
     val senderName: String,
-    val isFromLocalUser: Boolean,
 )

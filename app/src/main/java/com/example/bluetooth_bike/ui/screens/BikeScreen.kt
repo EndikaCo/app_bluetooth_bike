@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -76,7 +77,7 @@ fun BikeScreenContent(innerPadding: PaddingValues, uiState: UiState) {
 fun TripKmView(trip: String, total: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Spacer(modifier = Modifier.width(20.dp))
-        Text(text = "trip(km) ", fontSize = 10.sp)
+        Text(text = stringResource(R.string.trip_km), fontSize = 10.sp)
         Text(
             text = trip,
             modifier = Modifier.padding(end = 20.dp),
@@ -88,7 +89,7 @@ fun TripKmView(trip: String, total: String) {
             modifier = Modifier.padding(start = 20.dp),
             style = MaterialTheme.typography.titleSmall
         )
-        Text(text = " total(km)", fontSize = 10.sp)
+        Text(text = stringResource(R.string.total_km), fontSize = 10.sp)
     }
 }
 
@@ -97,7 +98,7 @@ fun SpeedInfoView(speed: String = "00") {
     Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.Center) {
         Text(text = speed, fontSize = 120.sp, modifier = Modifier.padding(start = 50.dp))
         Text(
-            text = "km/h",
+            text = stringResource(R.string.km_h),
             fontSize = 15.sp,
             textAlign = TextAlign.Start,
             modifier = Modifier.padding(bottom = 25.dp)
@@ -120,12 +121,12 @@ fun MyTopBar(name: String, onDisconnect: () -> Unit, onSettingsClick: () -> Unit
         ) {
             Icon(
                 imageVector = Icons.Default.ArrowBackIosNew,
-                contentDescription = "Close",
+                contentDescription = stringResource(R.string.close),
             )
         }
         Box {
             Text(
-                text = "Connected to $name",
+                text = stringResource(R.string.connected_to, name),
                 textAlign = TextAlign.Center,
             )
         }
@@ -135,7 +136,7 @@ fun MyTopBar(name: String, onDisconnect: () -> Unit, onSettingsClick: () -> Unit
         ) {
             Icon(
                 imageVector = Icons.Default.Settings,
-                contentDescription = "Settings",
+                contentDescription = stringResource(R.string.settings),
             )
         }
     }
@@ -151,15 +152,15 @@ fun MyBottomBar(onStartClick: () -> Unit, onLightClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-            IconButton(
-                onClick = { onStartClick() },
-                modifier = Modifier.size(60.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.start_icon),
-                    contentDescription = "Start",
-                    modifier = Modifier.size(40.dp)
-                )
+        IconButton(
+            onClick = { onStartClick() },
+            modifier = Modifier.size(60.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.start_icon),
+                contentDescription = stringResource(R.string.start),
+                modifier = Modifier.size(40.dp)
+            )
         }
         IconButton(
             onClick = { onLightClick() },
@@ -168,9 +169,8 @@ fun MyBottomBar(onStartClick: () -> Unit, onLightClick: () -> Unit) {
             Column {
                 Icon(
                     imageVector = Icons.Default.Highlight,
-                    contentDescription = "Turn ON Light",
+                    contentDescription = stringResource(R.string.turn_on_light),
                 )
-                Text(text = "Turn ON")
             }
         }
     }
@@ -181,17 +181,22 @@ fun MyBottomBar(onStartClick: () -> Unit, onLightClick: () -> Unit) {
 @Composable
 fun PreviewBikeScreen() {
     Bluetooth_bikeTheme {
+
+        val values = listOf(
+            BtMessage("65", "30", "30", "100", "1233", "Test Ebike"),
+            BtMessage("66", "2", "25", "100", "1233",  "Test Ebike"),
+            BtMessage("59", "50", "00", "100", "1233", "Test Ebike"),
+            BtMessage("67", "0", "10", "100", "1233",  "Test Ebike"),
+            BtMessage("66", "0", "00", "100", "1233",  "Test Ebike"),
+            BtMessage("68", "0", "00", "100", "1233",  "Test Ebike"),
+            BtMessage("63", "0", "00", "100", "1233",  "Test Ebike"),
+            BtMessage("65", "0", "00", "100", "1233",  "Test Ebike"),
+        )
+
         BikeScreen(
             UiState(
                 time = TimeModel("Mon", "12:00", "12 Jan"),
-                values = listOf(
-                    BtMessage("65", "30", "30", "100", "1233", "Ebike01", false),
-                    BtMessage("66", "2", "25", "100", "1233", "Ebike01", false),
-                    BtMessage("67", "0", "10", "100", "1233", "Ebike01", false),
-                    BtMessage("50", "50", "00", "100", "1233", "Ebike01", false),
-                    BtMessage("66", "0", "00", "100", "1233", "Ebike01", false),
-                    BtMessage("65", "0", "00", "100", "1233", "Ebike01", false),
-                )
+                values = values
             ),
             {},
             {},

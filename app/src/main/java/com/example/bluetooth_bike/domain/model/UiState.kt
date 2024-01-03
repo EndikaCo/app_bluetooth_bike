@@ -15,7 +15,6 @@ data class UiState(
             trip = "0.0",
             total = "0.0",
             senderName = "-",
-            isFromLocalUser = false
         )
     ),
     val time : TimeModel = TimeModel(),

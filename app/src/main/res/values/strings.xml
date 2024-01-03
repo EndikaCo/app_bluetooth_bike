@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Bluetooth_bike</string>
+    <string name="voltage">Voltage</string>
+    <string name="amperes">Amperes</string>
+    <string name="speed">Speed</string>
+    <string name="connected_to">Connected to %1$s</string>
+    <string name="close">Close</string>
+    <string name="settings">Settings</string>
+    <string name="start">Start</string>
+    <string name="turn_on_light">Turn ON Light</string>
+    <string name="trip_km">"trip(km) "</string>
+    <string name="total_km">" total(km)"</string>
+    <string name="km_h">km/h</string>
 </resources>

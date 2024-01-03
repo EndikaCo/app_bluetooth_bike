@@ -5,7 +5,4 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class MainActivityViewModel @Inject constructor(
-) : ViewModel(){
-    companion object { const val TAG = "*** MainActivityViewModel" }
-}
+class MainActivityViewModel @Inject constructor() : ViewModel()

@@ -5,7 +5,7 @@ import android.bluetooth.BluetoothDevice
 import com.example.bluetooth_bike.domain.model.BtDevice
 
 @SuppressLint("MissingPermission")
-fun BluetoothDevice.toBluetoothDeviceDomain(isPaired : Boolean): BtDevice {
+fun BluetoothDevice.toBtDeviceDomain(isPaired : Boolean): BtDevice {
     return BtDevice(
         name = name,
         address = address,

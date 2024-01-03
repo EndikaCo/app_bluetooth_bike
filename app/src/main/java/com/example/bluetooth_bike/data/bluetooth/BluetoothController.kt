@@ -13,13 +13,10 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.util.Log
-import com.example.bluetooth_bike.data.bluetooth.mappers.toBluetoothDeviceDomain
-import com.example.bluetooth_bike.data.bluetooth.mappers.toBluetoothMessage
-import com.example.bluetooth_bike.data.bluetooth.mappers.toByteArray
+import com.example.bluetooth_bike.data.bluetooth.mappers.toBtDeviceDomain
 import com.example.bluetooth_bike.data.bluetooth.receivers.BluetoothStateReceiver
 import com.example.bluetooth_bike.data.bluetooth.receivers.ScanDeviceReceiver
 import com.example.bluetooth_bike.domain.bluetooth.BluetoothController
-import com.example.bluetooth_bike.domain.model.BtMessage
 import com.example.bluetooth_bike.domain.model.BtDevice
 import com.example.bluetooth_bike.domain.bluetooth.ConnectionResult
 import com.example.bluetooth_bike.domain.utils.App
@@ -72,7 +69,7 @@ class BluetoothController(
 
     private val scanDeviceReceiver = ScanDeviceReceiver { device ->
         _devices.update { devices ->
-            val newDevice = device.toBluetoothDeviceDomain(isPaired = false)
+            val newDevice = device.toBtDeviceDomain(isPaired = false)
             if (newDevice in devices) devices else devices + newDevice
         }
     }
@@ -83,7 +80,7 @@ class BluetoothController(
 
         bluetoothAdapter
             ?.bondedDevices
-            ?.map { it.toBluetoothDeviceDomain(isPaired = true) }
+            ?.map { it.toBtDeviceDomain(isPaired = true) }
             ?.also { devices ->
                 _devices.update { devices }
             }
@@ -160,7 +157,7 @@ class BluetoothController(
 
     override fun startBluetoothServer(): Flow<ConnectionResult> {
         return flow {
-            if(!hasPermission(Manifest.permission.BLUETOOTH_CONNECT)) {
+            if (!hasPermission(Manifest.permission.BLUETOOTH_CONNECT)) {
                 throw SecurityException("No BLUETOOTH_CONNECT permission")
             }
 
@@ -170,17 +167,17 @@ class BluetoothController(
             )
 
             var shouldLoop = true
-            while(shouldLoop) {
+            while (shouldLoop) {
                 currentClientSocket = try {
                     currentServerSocket?.accept()
-                } catch(e: IOException) {
+                } catch (e: IOException) {
                     shouldLoop = false
                     null
                 }
                 emit(ConnectionResult.ConnectionEstablished)
-                currentClientSocket?.let {
+                currentClientSocket?.let { socket ->
                     currentServerSocket?.close()
-                    val service = BluetoothDataTransferService(it)
+                    val service = BluetoothDataTransferService(socket)
                     dataTransferService = service
 
                     emitAll(
@@ -203,11 +200,9 @@ class BluetoothController(
                 throw SecurityException("No BLUETOOTH_CONNECT permission")
             }
 
-            currentClientSocket = bluetoothAdapter
-                ?.getRemoteDevice(device.address)
-                ?.createRfcommSocketToServiceRecord(
-                    UUID.fromString(SERVICE_UUID)
-                )
+            currentClientSocket = bluetoothAdapter?.getRemoteDevice(device.address)
+                ?.createRfcommSocketToServiceRecord(UUID.fromString(SERVICE_UUID))
+
             stopDiscovery()
 
             currentClientSocket?.let { socket ->
@@ -215,10 +210,10 @@ class BluetoothController(
                     socket.connect()
                     emit(ConnectionResult.ConnectionEstablished)
 
-                    BluetoothDataTransferService(socket).also {
-                        dataTransferService = it
+                    BluetoothDataTransferService(socket).also { transferService ->
+                        dataTransferService = transferService
                         emitAll(
-                            it.listenForIncomingMessages()
+                            transferService.listenForIncomingMessages()
                                 .map { ConnectionResult.TransferSucceeded(it) }
                         )
                     }
@@ -229,24 +224,19 @@ class BluetoothController(
                     Log.e(App.tag, "Connection was interrupted: ${e.message}")
                 }
             }
-        }.onCompletion {
-            closeConnection()
-        }.flowOn(Dispatchers.IO)
+        }.onCompletion { closeConnection() }.flowOn(Dispatchers.IO)
     }
 
-    override suspend fun trySendMessage(message: String): BtMessage? {
+    override suspend fun trySendMessage(message: String): String? {
         if (!hasPermission(Manifest.permission.BLUETOOTH_CONNECT))
             return null
 
-        if(dataTransferService == null) {
+        if (dataTransferService == null)
             return null
-        }
 
-        val bluetoothMessage = message.toBluetoothMessage(isFromLocalUser = true)
+        dataTransferService?.sendMessage(message.toByteArray())
 
-        dataTransferService?.sendMessage(bluetoothMessage.toByteArray())
-
-        return bluetoothMessage
+        return message
     }
 
     override fun closeConnection() {

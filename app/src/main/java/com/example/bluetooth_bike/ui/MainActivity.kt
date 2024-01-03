@@ -21,7 +21,6 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val viewModel: MainActivityViewModel by viewModels()
-
     private val bluetoothManager by lazy { applicationContext.getSystemService(BluetoothManager::class.java) }
     private val bluetoothAdapter by lazy { bluetoothManager?.adapter }
     private val isBluetoothEnabled: Boolean get() = bluetoothAdapter?.isEnabled == true
@@ -33,7 +32,6 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             Bluetooth_bikeTheme {
-
                 Surface(
                     color = MaterialTheme.colorScheme.background
                 ) {

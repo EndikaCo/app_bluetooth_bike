@@ -18,14 +18,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -62,7 +60,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun DevicesScreen(
     state: UiState,
-    onStartServer: () -> Unit,
     onDeviceClick: (BtDevice) -> Unit,
     onScanClick: () -> Unit,
     onCloseClick: () -> Unit
@@ -266,8 +263,8 @@ fun PreviewDevicesScreen() {
         )
 
         val exampleBikeDevice = BtDevice(
-            name = "Test E bike",
-            address = "00:11:22:33:44:55",
+            name = "Test Ebike",
+            address = "45:12:32:25:69:32",
             btType = BluetoothDevice.DEVICE_TYPE_LE,
             btClass = null,
             isPaired = true
@@ -283,7 +280,6 @@ fun PreviewDevicesScreen() {
                     exampleDevice,
                 )
             ),
-            onStartServer = {},
             onDeviceClick = {},
             onScanClick = {},
             onCloseClick = {}

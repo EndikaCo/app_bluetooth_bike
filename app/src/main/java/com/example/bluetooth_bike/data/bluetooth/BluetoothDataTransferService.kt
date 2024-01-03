@@ -1,7 +1,7 @@
 package com.example.bluetooth_bike.data.bluetooth
 
 import android.bluetooth.BluetoothSocket
-import com.example.bluetooth_bike.data.bluetooth.mappers.toBluetoothMessage
+import com.example.bluetooth_bike.data.bluetooth.mappers.toBtMessage
 import com.example.bluetooth_bike.domain.model.BtMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -15,24 +15,18 @@ class BluetoothDataTransferService(
 ) {
     fun listenForIncomingMessages(): Flow<BtMessage> {
         return flow {
-            if(!socket.isConnected) {
+            if (!socket.isConnected) {
                 return@flow
             }
             val buffer = ByteArray(1024)
-            while(true) {
+            while (true) {
                 val byteCount = try {
                     socket.inputStream.read(buffer)
-                } catch(e: IOException) {
+                } catch (e: IOException) {
                     throw TransferFailedException()
                 }
 
-                emit(
-                    buffer.decodeToString(
-                        endIndex = byteCount
-                    ).toBluetoothMessage(
-                        isFromLocalUser = false
-                    )
-                )
+                emit(buffer.decodeToString(endIndex = byteCount).toBtMessage())
             }
         }.flowOn(Dispatchers.IO)
     }
@@ -41,14 +35,13 @@ class BluetoothDataTransferService(
         return withContext(Dispatchers.IO) {
             try {
                 socket.outputStream.write(bytes)
-            } catch(e: IOException) {
+            } catch (e: IOException) {
                 e.printStackTrace()
                 return@withContext false
             }
-
             true
         }
     }
 }
 
-class TransferFailedException: IOException("Reading incoming data failed")
+class TransferFailedException : IOException("Reading incoming data failed")

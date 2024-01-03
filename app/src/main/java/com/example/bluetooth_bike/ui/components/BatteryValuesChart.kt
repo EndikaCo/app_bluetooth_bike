@@ -18,9 +18,11 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.bluetooth_bike.R
 import com.example.bluetooth_bike.domain.model.BtMessage
 import com.example.bluetooth_bike.domain.model.Point
 import com.example.bluetooth_bike.domain.model.TimeModel
@@ -56,9 +58,8 @@ fun LineChart(modifier: Modifier, voltage: List<Point>) {
     val minXValue = voltage.minOf { it.x }
     val maxXValue = voltage.maxOf { it.x }
 
-    // find max and min value of Y, we will need that later
-    val minYValue = voltage.minOf { it.y }
-    val maxYValue = voltage.maxOf { it.y }
+    val minYValue = 45f
+    val maxYValue = 80f
 
     // create Box with canvas
     Box(modifier = modifier
@@ -115,7 +116,7 @@ fun ShowLegend() {
                 .background(Color.Green, RoundedCornerShape(4.dp))
         )
         Spacer(modifier = Modifier.width(2.dp))
-        Text(text = "Voltage", fontSize = 6.sp, style = MaterialTheme.typography.titleSmall)
+        Text(text = stringResource(R.string.voltage), fontSize = 6.sp, style = MaterialTheme.typography.titleSmall)
         Spacer(modifier = Modifier.width(10.dp))
         Box(
             modifier = Modifier
@@ -123,7 +124,7 @@ fun ShowLegend() {
                 .background(Color.Yellow, RoundedCornerShape(4.dp))
         )
         Spacer(modifier = Modifier.width(2.dp))
-        Text(text = "Amperes", fontSize = 6.sp, style = MaterialTheme.typography.titleSmall)
+        Text(text = stringResource(R.string.amperes), fontSize = 6.sp, style = MaterialTheme.typography.titleSmall)
 
         Spacer(modifier = Modifier.width(10.dp))
         Box(
@@ -132,7 +133,7 @@ fun ShowLegend() {
                 .background(Color.Blue, RoundedCornerShape(4.dp))
         )
         Spacer(modifier = Modifier.width(2.dp))
-        Text(text = "Speed", fontSize = 6.sp, style = MaterialTheme.typography.titleSmall)
+        Text(text = stringResource(R.string.speed), fontSize = 6.sp, style = MaterialTheme.typography.titleSmall)
     }
 }
 
@@ -149,15 +150,19 @@ fun Float.mapValueToDifferentRange(
 @Composable
 fun PreviewBatteryValuesChart() {
 
+    val values = listOf(
+        BtMessage("65", "30", "30", "100", "1233", "Ebike01"),
+        BtMessage("66", "2", "25", "100", "1233", "Ebike01"),
+        BtMessage("59", "50", "00", "100", "1233", "Ebike01"),
+        BtMessage("67", "0", "10", "100", "1233", "Ebike01"),
+        BtMessage("66", "0", "00", "100", "1233", "Ebike01"),
+        BtMessage("68", "0", "00", "100", "1233", "Ebike01"),
+        BtMessage("63", "0", "00", "100", "1233", "Ebike01"),
+        BtMessage("65", "0", "00", "100", "1233", "Ebike01"),
+    )
+    
     val uiState = UiState(
-        time = TimeModel("Mon", "12:00", "12 Jan"), values = listOf(
-            BtMessage("65", "30", "30", "100", "1233", "Ebike01", false),
-            BtMessage("66", "2", "25", "100", "1233", "Ebike01", false),
-            BtMessage("50", "50", "00", "100", "1233", "Ebike01", false),
-            BtMessage("67", "0", "10", "100", "1233", "Ebike01", false),
-            BtMessage("66", "0", "00", "100", "1233", "Ebike01", false),
-            BtMessage("65", "0", "00", "100", "1233", "Ebike01", false),
-        )
+        time = TimeModel("Mon", "12:00", "12 Jan"), values = values
     )
 
     Bluetooth_bikeTheme {

@@ -28,7 +28,6 @@ fun NavGraph() {
     val state by viewModel.state.collectAsState()
     val activity = LocalContext.current as Activity
 
-    //listen to state
     LaunchedEffect(state) {
         if(state.isConnected)
             navigationController.navigate(Routes.ChatScreen.routes)
@@ -47,7 +46,6 @@ fun NavGraph() {
                 state = state,
                 onScanClick = viewModel::scanToggle,
                 onDeviceClick = viewModel::connectToDevice,
-                onStartServer = viewModel::waitForIncomingConnections,
                 onCloseClick = { activity.finish() }
             )
         }
@@ -56,8 +54,8 @@ fun NavGraph() {
             BikeScreen(
                 uiState = state,
                 onDisconnect = viewModel::disconnectFromDevice,
-                onStartClick = { viewModel.sendData("START") }, //todo
-                onLightClick = { viewModel.sendData("LIGHT ON") } //todo
+                onStartClick = { viewModel.sendData("STR") },
+                onLightClick = { viewModel.sendData("LON") }
             )
         }
 
