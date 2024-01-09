@@ -6,5 +6,4 @@ data class BtMessage(
     val speed: String,
     val trip : String,
     val total : String,
-    val senderName: String,
 )

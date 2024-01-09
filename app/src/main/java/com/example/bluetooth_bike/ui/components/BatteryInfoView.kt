@@ -81,7 +81,7 @@ fun PreviewBatteryInfoView() {
             speed = "10",
             trip = "10",
             total = "10",
-            senderName = "test")
+        )
     BatteryInfoView(mockData)
 }
 
@@ -96,7 +96,7 @@ fun PreviewBatteryInfoView2() {
             speed = "10",
             trip = "10.50",
             total = "101.50",
-            senderName = "test")
+        )
     BatteryInfoView(mockData)
 }
 
@@ -112,6 +112,6 @@ fun PreviewBatteryInfoView3() {
             speed = "10",
             trip = "10.50",
             total = "101.50",
-            senderName = "test")
+        )
     BatteryInfoView(mockData)}
 }

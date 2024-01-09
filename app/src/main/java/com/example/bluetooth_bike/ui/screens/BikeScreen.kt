@@ -38,8 +38,8 @@ fun BikeScreen(
     onLightClick: () -> Unit
 ) {
     val name =
-        if (uiState.values.isNotEmpty())
-            uiState.values.last().senderName
+        if (uiState.connectedDevice != null && (uiState.connectedDevice.name?.isNotEmpty()) ==  true)
+            uiState.connectedDevice.name
         else "Unknown"
 
     Scaffold(
@@ -183,14 +183,14 @@ fun PreviewBikeScreen() {
     Bluetooth_bikeTheme {
 
         val values = listOf(
-            BtMessage("65", "30", "30", "100", "1233", "Test Ebike"),
-            BtMessage("66", "2", "25", "100", "1233",  "Test Ebike"),
-            BtMessage("59", "50", "00", "100", "1233", "Test Ebike"),
-            BtMessage("67", "0", "10", "100", "1233",  "Test Ebike"),
-            BtMessage("66", "0", "00", "100", "1233",  "Test Ebike"),
-            BtMessage("68", "0", "00", "100", "1233",  "Test Ebike"),
-            BtMessage("63", "0", "00", "100", "1233",  "Test Ebike"),
-            BtMessage("65", "0", "00", "100", "1233",  "Test Ebike"),
+            BtMessage("65", "30", "30", "100", "1233"),
+            BtMessage("66", "2", "25", "100", "1233"),
+            BtMessage("59", "50", "00", "100", "1233"),
+            BtMessage("67", "0", "10", "100", "1233"),
+            BtMessage("66", "0", "00", "100", "1233"),
+            BtMessage("68", "0", "00", "100", "1233"),
+            BtMessage("63", "0", "00", "100", "1233"),
+            BtMessage("65", "0", "00", "100", "1233"),
         )
 
         BikeScreen(

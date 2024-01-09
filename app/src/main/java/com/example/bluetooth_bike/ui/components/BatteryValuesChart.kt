@@ -43,7 +43,7 @@ fun BatteryValuesChart(values: List<BtMessage>) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.background (MaterialTheme.colorScheme.background)
+        modifier = Modifier.background(MaterialTheme.colorScheme.background)
     ) {
         LineChart(Modifier.size(250.dp, 200.dp), parsedValues)
         Spacer(modifier = Modifier.height(10.dp))
@@ -116,7 +116,11 @@ fun ShowLegend() {
                 .background(Color.Green, RoundedCornerShape(4.dp))
         )
         Spacer(modifier = Modifier.width(2.dp))
-        Text(text = stringResource(R.string.voltage), fontSize = 6.sp, style = MaterialTheme.typography.titleSmall)
+        Text(
+            text = stringResource(R.string.voltage),
+            fontSize = 6.sp,
+            style = MaterialTheme.typography.titleSmall
+        )
         Spacer(modifier = Modifier.width(10.dp))
         Box(
             modifier = Modifier
@@ -124,7 +128,11 @@ fun ShowLegend() {
                 .background(Color.Yellow, RoundedCornerShape(4.dp))
         )
         Spacer(modifier = Modifier.width(2.dp))
-        Text(text = stringResource(R.string.amperes), fontSize = 6.sp, style = MaterialTheme.typography.titleSmall)
+        Text(
+            text = stringResource(R.string.amperes),
+            fontSize = 6.sp,
+            style = MaterialTheme.typography.titleSmall
+        )
 
         Spacer(modifier = Modifier.width(10.dp))
         Box(
@@ -133,7 +141,11 @@ fun ShowLegend() {
                 .background(Color.Blue, RoundedCornerShape(4.dp))
         )
         Spacer(modifier = Modifier.width(2.dp))
-        Text(text = stringResource(R.string.speed), fontSize = 6.sp, style = MaterialTheme.typography.titleSmall)
+        Text(
+            text = stringResource(R.string.speed),
+            fontSize = 6.sp,
+            style = MaterialTheme.typography.titleSmall
+        )
     }
 }
 
@@ -151,16 +163,16 @@ fun Float.mapValueToDifferentRange(
 fun PreviewBatteryValuesChart() {
 
     val values = listOf(
-        BtMessage("65", "30", "30", "100", "1233", "Ebike01"),
-        BtMessage("66", "2", "25", "100", "1233", "Ebike01"),
-        BtMessage("59", "50", "00", "100", "1233", "Ebike01"),
-        BtMessage("67", "0", "10", "100", "1233", "Ebike01"),
-        BtMessage("66", "0", "00", "100", "1233", "Ebike01"),
-        BtMessage("68", "0", "00", "100", "1233", "Ebike01"),
-        BtMessage("63", "0", "00", "100", "1233", "Ebike01"),
-        BtMessage("65", "0", "00", "100", "1233", "Ebike01"),
+        BtMessage("65", "30", "30", "100", "1233"),
+        BtMessage("66", "2", "25", "100", "1233"),
+        BtMessage("59", "50", "00", "100", "1233"),
+        BtMessage("67", "0", "10", "100", "1233"),
+        BtMessage("66", "0", "00", "100", "1233"),
+        BtMessage("68", "0", "00", "100", "1233"),
+        BtMessage("63", "0", "00", "100", "1233"),
+        BtMessage("65", "0", "00", "100", "1233"),
     )
-    
+
     val uiState = UiState(
         time = TimeModel("Mon", "12:00", "12 Jan"), values = values
     )

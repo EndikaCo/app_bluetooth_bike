@@ -14,8 +14,8 @@ data class UiState(
             speed = "00",
             trip = "0.0",
             total = "0.0",
-            senderName = "-",
         )
     ),
     val time : TimeModel = TimeModel(),
+    val connectedDevice : BtDevice? = null,
 )

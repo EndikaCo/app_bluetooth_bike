@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
 interface BluetoothController {
+    val connectedDeviceName: StateFlow<String>
     val devices: StateFlow<List<BtDevice>>
     val isScanning: StateFlow<Boolean>
     val isConnected: StateFlow<Boolean>
@@ -13,9 +14,8 @@ interface BluetoothController {
 
     fun startDiscovery()
     fun stopDiscovery()
-    fun startBluetoothServer(): Flow<ConnectionResult>
     fun connectToDevice(device: BtDevice): Flow<ConnectionResult>
-    suspend fun trySendMessage(message : String) : String?
+    suspend fun trySendMessage(message: String): String?
     fun closeConnection()
     fun release()
 }

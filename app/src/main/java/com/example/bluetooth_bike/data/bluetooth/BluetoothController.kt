@@ -67,6 +67,11 @@ class BluetoothController(
     override val errors: SharedFlow<String>
         get() = _errors.asSharedFlow()
 
+    private val _connectedDeviceName = MutableStateFlow("")
+    override val connectedDeviceName: StateFlow<String>
+        get() = _connectedDeviceName.asStateFlow()
+
+
     private val scanDeviceReceiver = ScanDeviceReceiver { device ->
         _devices.update { devices ->
             val newDevice = device.toBtDeviceDomain(isPaired = false)
@@ -103,6 +108,7 @@ class BluetoothController(
     private val bluetoothStateReceiver = BluetoothStateReceiver { isConnected, bluetoothDevice ->
         if (bluetoothAdapter?.bondedDevices?.contains(bluetoothDevice) == true) {
             _isConnected.update { isConnected }
+            _connectedDeviceName.update { if (isConnected) bluetoothDevice.name ?: "" else "Unknown" }
         } else {
             CoroutineScope(Dispatchers.IO).launch {
                 _errors.emit("Can't connect to a non-paired device.")
@@ -153,45 +159,6 @@ class BluetoothController(
             return
 
         bluetoothAdapter?.cancelDiscovery()
-    }
-
-    override fun startBluetoothServer(): Flow<ConnectionResult> {
-        return flow {
-            if (!hasPermission(Manifest.permission.BLUETOOTH_CONNECT)) {
-                throw SecurityException("No BLUETOOTH_CONNECT permission")
-            }
-
-            currentServerSocket = bluetoothAdapter?.listenUsingRfcommWithServiceRecord(
-                "chat_service",
-                UUID.fromString(SERVICE_UUID)
-            )
-
-            var shouldLoop = true
-            while (shouldLoop) {
-                currentClientSocket = try {
-                    currentServerSocket?.accept()
-                } catch (e: IOException) {
-                    shouldLoop = false
-                    null
-                }
-                emit(ConnectionResult.ConnectionEstablished)
-                currentClientSocket?.let { socket ->
-                    currentServerSocket?.close()
-                    val service = BluetoothDataTransferService(socket)
-                    dataTransferService = service
-
-                    emitAll(
-                        service
-                            .listenForIncomingMessages()
-                            .map {
-                                ConnectionResult.TransferSucceeded(it)
-                            }
-                    )
-                }
-            }
-        }.onCompletion {
-            closeConnection()
-        }.flowOn(Dispatchers.IO)
     }
 
     override fun connectToDevice(device: BtDevice): Flow<ConnectionResult> {

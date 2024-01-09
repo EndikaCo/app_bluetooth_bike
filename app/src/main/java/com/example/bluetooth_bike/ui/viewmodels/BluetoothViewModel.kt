@@ -35,6 +35,7 @@ class BluetoothViewModel @Inject constructor(
         _state
     ) {  devices, isScanning, uiState ->
         uiState.copy(
+            connectedDevice = uiState.connectedDevice,
             pairedDevices = devices,
             isScanning = isScanning,
             values = if (uiState.isConnected) uiState.values else emptyList()
