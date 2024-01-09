@@ -2,7 +2,7 @@ Bluetooth Ebike connector
 =====
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/EndikaCo/Bluetooth_bike/LICENSE)
-[![CI](https://github.com/EndikaCo/Bluetooth_bike/actions/workflows/testing.yml/badge.svg)]()
+[![CI](https://github.com/EndikaCo/app_bluetooth_bike/actions/workflows/testing.yml/badge.svg)]()
 
 Simple app to connect to a Ebike via bluetooth, get the data from it, and send commands back to interact with it.
 
