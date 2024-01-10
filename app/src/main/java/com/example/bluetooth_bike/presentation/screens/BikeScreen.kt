@@ -1,4 +1,4 @@
-package com.example.bluetooth_bike.ui.screens
+package com.example.bluetooth_bike.presentation.screens
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
@@ -25,10 +25,10 @@ import com.example.bluetooth_bike.R
 import com.example.bluetooth_bike.domain.model.BtMessage
 import com.example.bluetooth_bike.domain.model.UiState
 import com.example.bluetooth_bike.domain.model.TimeModel
-import com.example.bluetooth_bike.ui.components.BatteryInfoView
-import com.example.bluetooth_bike.ui.components.BatteryValuesChart
-import com.example.bluetooth_bike.ui.components.DateInfoView
-import com.example.bluetooth_bike.ui.theme.Bluetooth_bikeTheme
+import com.example.bluetooth_bike.presentation.components.BatteryInfoView
+import com.example.bluetooth_bike.presentation.components.BatteryValuesChart
+import com.example.bluetooth_bike.presentation.components.DateInfoView
+import com.example.bluetooth_bike.presentation.theme.Bluetooth_bikeTheme
 
 @Composable
 fun BikeScreen(

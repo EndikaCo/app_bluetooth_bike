@@ -1,4 +1,4 @@
-package com.example.bluetooth_bike.ui.components
+package com.example.bluetooth_bike.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,7 +10,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.bluetooth_bike.domain.model.TimeModel
-import com.example.bluetooth_bike.ui.theme.Bluetooth_bikeTheme
+import com.example.bluetooth_bike.presentation.theme.Bluetooth_bikeTheme
 
 @Composable
 fun DateInfoView(time: TimeModel) {

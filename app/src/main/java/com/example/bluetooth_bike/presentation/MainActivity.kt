@@ -1,4 +1,4 @@
-package com.example.bluetooth_bike.ui
+package com.example.bluetooth_bike.presentation
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
@@ -9,18 +9,15 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import com.example.bluetooth_bike.ui.navigation.NavGraph
-import com.example.bluetooth_bike.ui.theme.Bluetooth_bikeTheme
-import com.example.bluetooth_bike.ui.viewmodels.MainActivityViewModel
+import com.example.bluetooth_bike.presentation.navigation.NavGraph
+import com.example.bluetooth_bike.presentation.theme.Bluetooth_bikeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: MainActivityViewModel by viewModels()
     private val bluetoothManager by lazy { applicationContext.getSystemService(BluetoothManager::class.java) }
     private val bluetoothAdapter by lazy { bluetoothManager?.adapter }
     private val isBluetoothEnabled: Boolean get() = bluetoothAdapter?.isEnabled == true

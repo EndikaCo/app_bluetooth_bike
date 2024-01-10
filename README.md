@@ -2,9 +2,10 @@ Bluetooth Ebike connector
 =====
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/EndikaCo/Bluetooth_bike/LICENSE)
-[![CI](https://github.com/EndikaCo/app_bluetooth_bike/actions/workflows/testing.yml/badge.svg)]()
+[![CI](https://github.com/EndikaCo/app_bluetooth_bike/actions/workflows/testing.yml/badge.svg)](https://github.com/EndikaCo/Bluetooth_bike/actions/workflows/testing.yml)
 
-Simple app to connect to a Ebike via bluetooth, get the data from it, and send commands back to interact with it.
+Simple app to connect to a Ebike via bluetooth, get the data from it, and send commands back to
+interact with it.
 
 [![Android](https://img.shields.io/badge/Android-grey?style=&logo=android&logoColor=green)](https://www.android.com/)
 [![KOTLIN](https://img.shields.io/badge/Kotlin-grey?style=none&logo=Kotlin&logoColor=-5C2D91)](https://kotlinlang.org/)
@@ -15,6 +16,6 @@ Simple app to connect to a Ebike via bluetooth, get the data from it, and send c
 [![State Flow](https://img.shields.io/badge/State_Flow-grey?style=&logo=)]()
 [![Canvas](https://img.shields.io/badge/canvas-grey?style=none&logo=canvas&logoColor=white)]()
 
-| Devices screen                       | Bike screen                         |
-|--------------------------------------|-------------------------------------|
-| ![img.png](images/devicesScreen.png) | ![img_1.png](images/bikeScreen.png) |
+| Devices screen                             | Bike screen                          |
+|--------------------------------------------|--------------------------------------|
+| ![devicesScreen](images/devicesScreen.png) | ![bikeScreen](images/bikeScreen.png) |

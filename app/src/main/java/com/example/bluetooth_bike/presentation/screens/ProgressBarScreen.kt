@@ -1,4 +1,4 @@
- package com.example.bluetooth_bike.ui.screens
+ package com.example.bluetooth_bike.presentation.screens
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.bluetooth_bike.ui.theme.Bluetooth_bikeTheme
+import com.example.bluetooth_bike.presentation.theme.Bluetooth_bikeTheme
 
 @Composable
 fun ProgressBarScreen(onCancelClick: () -> Unit) {

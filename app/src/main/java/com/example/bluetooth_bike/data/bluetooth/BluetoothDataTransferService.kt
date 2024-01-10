@@ -23,7 +23,7 @@ class BluetoothDataTransferService(
                 val byteCount = try {
                     socket.inputStream.read(buffer)
                 } catch (e: IOException) {
-                    throw TransferFailedException()
+                    throw IOException("Reading incoming data failed")
                 }
 
                 emit(buffer.decodeToString(endIndex = byteCount).toBtMessage())
@@ -43,5 +43,3 @@ class BluetoothDataTransferService(
         }
     }
 }
-
-class TransferFailedException : IOException("Reading incoming data failed")

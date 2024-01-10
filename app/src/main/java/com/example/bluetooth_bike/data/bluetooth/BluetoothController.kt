@@ -44,6 +44,10 @@ class BluetoothController(
     private val context: Context
 ) : BluetoothController {
 
+    companion object {
+        const val SERVICE_UUID = "27b7d1da-08c7-4505-a6d1-2459987e5e2d"
+    }
+
     private val bluetoothManager by lazy {
         context.getSystemService(BluetoothManager::class.java)
     }
@@ -71,6 +75,9 @@ class BluetoothController(
     override val connectedDeviceName: StateFlow<String>
         get() = _connectedDeviceName.asStateFlow()
 
+    private var currentServerSocket: BluetoothServerSocket? = null
+    private var currentClientSocket: BluetoothSocket? = null
+    private var dataTransferService: BluetoothDataTransferService? = null
 
     private val scanDeviceReceiver = ScanDeviceReceiver { device ->
         _devices.update { devices ->
@@ -115,11 +122,6 @@ class BluetoothController(
             }
         }
     }
-
-    private var currentServerSocket: BluetoothServerSocket? = null
-    private var currentClientSocket: BluetoothSocket? = null
-
-    private var dataTransferService: BluetoothDataTransferService? = null
 
     init {
         updatePairedDevices()
@@ -222,9 +224,5 @@ class BluetoothController(
 
     private fun hasPermission(permission: String): Boolean {
         return context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
-    }
-
-    companion object {
-        const val SERVICE_UUID = "27b7d1da-08c7-4505-a6d1-2459987e5e2d"
     }
 }

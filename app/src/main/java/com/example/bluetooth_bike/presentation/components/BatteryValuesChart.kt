@@ -1,4 +1,4 @@
-package com.example.bluetooth_bike.ui.components
+package com.example.bluetooth_bike.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -27,7 +27,7 @@ import com.example.bluetooth_bike.domain.model.BtMessage
 import com.example.bluetooth_bike.domain.model.Point
 import com.example.bluetooth_bike.domain.model.TimeModel
 import com.example.bluetooth_bike.domain.model.UiState
-import com.example.bluetooth_bike.ui.theme.Bluetooth_bikeTheme
+import com.example.bluetooth_bike.presentation.theme.Bluetooth_bikeTheme
 
 
 fun parseBtMessagesToPoints(btMessages: List<BtMessage>): List<Point> {

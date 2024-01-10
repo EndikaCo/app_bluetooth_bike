@@ -1,4 +1,4 @@
-package com.example.bluetooth_bike.ui.screens
+package com.example.bluetooth_bike.presentation.screens
 
 import android.bluetooth.BluetoothDevice
 import android.content.res.Configuration
@@ -54,7 +54,7 @@ import androidx.compose.ui.unit.sp
 import com.example.bluetooth_bike.R
 import com.example.bluetooth_bike.domain.model.BtDevice
 import com.example.bluetooth_bike.domain.model.UiState
-import com.example.bluetooth_bike.ui.theme.Bluetooth_bikeTheme
+import com.example.bluetooth_bike.presentation.theme.Bluetooth_bikeTheme
 import kotlinx.coroutines.launch
 
 @Composable

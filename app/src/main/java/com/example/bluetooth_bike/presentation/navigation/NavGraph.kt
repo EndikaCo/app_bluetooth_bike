@@ -1,4 +1,4 @@
-package com.example.bluetooth_bike.ui.navigation
+package com.example.bluetooth_bike.presentation.navigation
 
 import android.app.Activity
 import androidx.compose.runtime.Composable
@@ -10,10 +10,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.bluetooth_bike.ui.screens.BikeScreen
-import com.example.bluetooth_bike.ui.screens.ProgressBarScreen
-import com.example.bluetooth_bike.ui.screens.DevicesScreen
-import com.example.bluetooth_bike.ui.viewmodels.BluetoothViewModel
+import com.example.bluetooth_bike.presentation.screens.BikeScreen
+import com.example.bluetooth_bike.presentation.screens.ProgressBarScreen
+import com.example.bluetooth_bike.presentation.screens.DevicesScreen
+import com.example.bluetooth_bike.presentation.viewmodels.BluetoothViewModel
 
 sealed class Routes(val routes: String) {
     object DevicesScreen : Routes("p1")

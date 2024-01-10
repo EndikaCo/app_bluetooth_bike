@@ -1,4 +1,4 @@
-package com.example.bluetooth_bike.ui.viewmodels
+package com.example.bluetooth_bike.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
