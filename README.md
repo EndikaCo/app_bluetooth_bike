@@ -16,6 +16,6 @@ interact with it.
 [![State Flow](https://img.shields.io/badge/State_Flow-grey?style=&logo=)]()
 [![Canvas](https://img.shields.io/badge/canvas-grey?style=none&logo=canvas&logoColor=white)]()
 
-| Devices screen                             | Bike screen                          |
-|--------------------------------------------|--------------------------------------|
-| ![devicesScreen](images/devicesScreen.png) | ![bikeScreen](images/bikeScreen.png) |
+| ![devicesScreen](images/img_1.png) | ![img_3.png](images/img_2.png) | ![bikeScreen](images/img_3.png) |
+|------------------------------------|-------------------------|---------------------------------|
+
